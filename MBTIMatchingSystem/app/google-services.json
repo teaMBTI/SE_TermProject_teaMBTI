@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1031075475736",
+    "project_id": "mbtiteammatching",
+    "storage_bucket": "mbtiteammatching.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031075475736:android:5d9a3709b8bbfa36c02e6d",
+        "android_client_info": {
+          "package_name": "com.seproject.mbtimatchingsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1031075475736-89tr5elqu95rh52s56eh6onrb6g5h1c1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seproject.mbtimatchingsystem",
+            "certificate_hash": "8f93fd546c439d51fd15f57a59a3b3a99565ab87"
+          }
+        },
+        {
+          "client_id": "1031075475736-1kiferpns4euj6kmd529numpb2ieu954.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvXRgyCSVZsCvtLnmNd9krqG4iK9RPEZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031075475736-1kiferpns4euj6kmd529numpb2ieu954.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

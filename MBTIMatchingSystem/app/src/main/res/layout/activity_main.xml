@@ -9,20 +9,20 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/tv_contents"
+        android:id="@+id/LoginIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TeaMBTI!"
+        android:text="구글 로그인창"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         />
 
     <ImageView
-        android:id="@+id/iv_glide"
+        android:id="@+id/MBTI_TEAM"
         android:src="@drawable/mbti_team"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_contents"
+        android:layout_below="@+id/LoginIn"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"/>
 
@@ -31,7 +31,15 @@
         android:id="@+id/signInButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/iv_glide"
+        android:layout_below="@+id/MBTI_TEAM"
         android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/logOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="로그아웃"/>
+
 
 </RelativeLayout>

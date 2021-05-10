@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.seproject.mbtimatchingsystem">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -11,9 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MBTIMatchingSystem">
-        <activity android:name=".WriteSInformation"></activity>
-        <activity android:name=".WritePInformation"></activity>
-
+        <activity android:name=".PopupAddCourse"></activity>
+        <activity android:name=".WriteSInformation" />
+        <activity android:name=".WritePInformation" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,10 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".JoinActivity" />
         <activity android:name=".MainActivity" />
-
     </application>
 
 </manifest>

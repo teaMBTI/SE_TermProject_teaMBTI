@@ -33,6 +33,17 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
 
 
+        //Team Project List 화면으로 이동
+        Button btn_tp = (Button) findViewById(R.id.btn_tp);
+        btn_tp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent NewActivity = new Intent(getApplicationContext(), ListTeamProject.class);
+                startActivity(NewActivity);
+            }
+        });
+
+
         mAuth =FirebaseAuth.getInstance(); //파이어베이스 인증 객체 선언
         Button button = findViewById(R.id.logOutButton); //로그아웃 버튼
         button.setOnClickListener(new View.OnClickListener() {

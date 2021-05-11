@@ -32,14 +32,16 @@
         android:dividerHeight="10dp"
         />
 
-    <Button
+
+    <ImageButton
         android:id="@+id/addCourseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="74dp"
+        android:layout_height="74dp"
         android:layout_below="@+id/listViewCourseRoom"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="20dp"
-        android:text="+"
-        android:textSize="11dp" />
+        android:layout_marginStart="300dp"
+        android:background="@android:color/transparent"
+        android:padding="0sp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/plus" />
 
 </RelativeLayout>

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -17,7 +18,7 @@ import android.widget.Toast;
 public class ListCourseRoom extends AppCompatActivity {
 
 
-    Button addCourseButton;
+    ImageButton addCourseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,9 @@ public class ListCourseRoom extends AppCompatActivity {
 
         //ListView생성
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
+        //리스트뷰에 버튼을 넣어 버튼클릭시 강좌에 들어갈 수 있게 만든다.
+
+
 
         //수업 검색기능을 넣는게 좋을지도<-꼭 구현을 해야할까?
         String[] CourseNameArray = {"경제학개론", "졸업작품1", "중국어1", "모바일프로그래밍", "소프트웨어공학", "생명과 나눔", "한국사"};

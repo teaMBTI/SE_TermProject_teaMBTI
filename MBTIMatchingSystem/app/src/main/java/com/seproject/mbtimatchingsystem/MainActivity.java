@@ -19,13 +19,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 
 public class MainActivity extends AppCompatActivity  {
-
-    private FirebaseAuth mAuth=null; //파이어베이스 인스턴스 선언
-    Button logOutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,26 +42,9 @@ public class MainActivity extends AppCompatActivity  {
         });
 
 
-        mAuth =FirebaseAuth.getInstance(); //파이어베이스 인증 객체 선언
-        Button button = findViewById(R.id.logOutButton); //로그아웃 버튼
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                startLoginActivity(); //로그아웃되면 로그인 화면으로 이동
-            }
-        });
+
     }
 
-    private void startLoginActivity()
-    {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
 
-    private void startToast(String msg)
-    {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
 
 }

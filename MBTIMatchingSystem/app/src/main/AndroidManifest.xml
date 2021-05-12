@@ -14,7 +14,7 @@
         <activity android:name=".PopupAddCourse"></activity>
         <activity android:name=".WriteSInformation" />
         <activity android:name=".WritePInformation" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".ListCourseRoom">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,8 +23,8 @@
         </activity>
         <activity android:name=".JoinActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".ListCourseRoom" />
-        <activity android:name=".ListTeamProject"/>
+        <activity android:name=".LoginActivity" />
+<!--        <activity android:name=".ListTeamProject"/>-->
         <activity android:name=".MakeTeam"/>
     </application>
 

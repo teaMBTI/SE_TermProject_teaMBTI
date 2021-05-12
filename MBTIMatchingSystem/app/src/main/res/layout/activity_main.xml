@@ -26,17 +26,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"/>
 
-    <Button
-        android:id="@+id/logOutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#4CAF50"
-        android:layout_alignParentBottom="true"
-        android:text="로그아웃"
-        android:textColor="#FFFFFF"
-        app:cornerRadius="30dp"
-        android:textSize="18sp"
-        />
 
     <Button
         android:id="@+id/btn_tp"

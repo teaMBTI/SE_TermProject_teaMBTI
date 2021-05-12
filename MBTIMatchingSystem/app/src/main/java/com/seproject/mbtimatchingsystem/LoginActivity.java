@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 startToast("로그인 성공");
-                                startMainActivity(); //로그인 성공 시 메인 화면으로 이동
+                                startListCourseRoomActivity(); //로그인 성공 시 메인 화면으로 이동
                             } else {
                                 // If sign in fails, display a message to the user.
                                 //Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -107,9 +107,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 //        startJoinActivity(); //뒤로가기 누르면 회원가입 화면으로
 //    }
 
-    private void startMainActivity()
+    private void startListCourseRoomActivity()
     {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ListCourseRoom.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // 로그인 후 메인으로 가면 뒤로가기 시 다시 로그인정보가 들어 있는 화면이 아닌 앱꺼지기
         startActivity(intent);
     }

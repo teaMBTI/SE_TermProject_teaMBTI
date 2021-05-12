@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity  {
         btn_tp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              // Intent NewActivity = new Intent(getApplicationContext(), ListTeamProject.class);
-              // startActivity(NewActivity);
+             /*   Intent NewActivity = new Intent(getApplicationContext(), ListTeamProject.class);
+                startActivity(NewActivity);   주석 풀어야함. 임시주석*/
             }
         });
 
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity  {
         Intent intent = new Intent(this, JoinActivity.class);
         startActivity(intent);
     }
-
 
     private void startToast(String msg)
     {

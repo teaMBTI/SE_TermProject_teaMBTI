@@ -8,17 +8,26 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class ListCourseRoom extends AppCompatActivity {
 
-
+    private DatabaseReference mPostReference;
     ImageButton addCourseButton;
+    public String courseNum;
+    public String courseName;
+    public String pf_id;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,8 @@ public class ListCourseRoom extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showAddCourseDialog(); // AddCourse 팝업창을 띄운다.
+
+
             }
         });
     }
@@ -53,6 +64,7 @@ public class ListCourseRoom extends AppCompatActivity {
 
 
     //참고자료 메모
+    //레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
     // 다이얼로그 #1  https://m.blog.naver.com/kittoboy/110133796492
     // 출처: https://saeatechnote.tistory.com/entry/android안드로이드-Login-dialog만들기 [새아의 테크노트]
 
@@ -63,20 +75,37 @@ public class ListCourseRoom extends AppCompatActivity {
         LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout addCourseLayout = (LinearLayout) vi.inflate(R.layout.add_course_dialog, null);
 
-        final EditText courseNum = (EditText)addCourseLayout.findViewById(R.id.courseNum);
-        final EditText courseName = (EditText)addCourseLayout.findViewById(R.id.courseName);
-        final EditText profNum = (EditText)addCourseLayout.findViewById(R.id.profNum);
+        final EditText courseNum2 = (EditText)addCourseLayout.findViewById(R.id.courseNum);
+        final EditText courseName2 = (EditText)addCourseLayout.findViewById(R.id.courseName);
+        final EditText pf_id2 = (EditText)addCourseLayout.findViewById(R.id.pf_id);
 
         new AlertDialog.Builder(this)
                 .setTitle("과목 추가")
                 .setView(addCourseLayout)
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override public void onClick(DialogInterface dialog, int which) {
+
+                courseNum = courseNum2.getText().toString();
+                courseName = courseName2.getText().toString();
+                pf_id = pf_id2.getText().toString();
+
                 Toast.makeText(ListCourseRoom.this,
-                        "학수번호 : " + courseNum.getText().toString()
-                            + "@n과목명 : " +courseName.getText().toString()
-                                + "@n교수 교번 : " +profNum.getText().toString()
-                        , Toast.LENGTH_SHORT).show(); } }).show();
+                        "학수번호 : " + courseNum  + "@n과목명 : " +courseName  + "@n교수 교번 : " +pf_id , Toast.LENGTH_SHORT).show(); } }).show();
+
+                 postDBData(true);
+
+    }
+
+    private void postDBData(boolean add) {
+        mPostReference = FirebaseDatabase.getInstance().getReference();
+        Map<String, Object> childUpdates = new HashMap<>();
+        Map<String, Object> postValues = null;
+        if(add){
+            DBData post = new DBData(courseNum, courseName, pf_id);
+            postValues = post.toMap();
+        }
+        childUpdates.put("/course_list/" + courseNum, postValues);
+        mPostReference.updateChildren(childUpdates);
 
     }
 

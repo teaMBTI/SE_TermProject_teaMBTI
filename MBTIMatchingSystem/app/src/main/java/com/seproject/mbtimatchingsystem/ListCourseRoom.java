@@ -53,11 +53,8 @@ public class ListCourseRoom extends AppCompatActivity {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 for (UserInfo profile : user.getProviderData()) {
-                    // 사용자 이름 가져오기
+                    // 사용자 닉네임 가져오기
                     String name = profile.getDisplayName();
-                    String email = profile.getEmail();
-                    TextView a = findViewById(R.id.textView7);
-                    //a.setText(name);
 
                 }
             }

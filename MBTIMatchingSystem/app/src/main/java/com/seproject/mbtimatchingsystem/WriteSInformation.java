@@ -31,7 +31,7 @@ public class WriteSInformation extends AppCompatActivity {
                             "ESTP","ESFP","ENFP","ENTP",
                             "ESTJ","ESFJ","ENFJ","ENTJ"};
    public String mbti;
-   public String call;
+   public String phone;
    public String katalk;
    public CheckBox checkBox;
    public String status;
@@ -43,7 +43,7 @@ public class WriteSInformation extends AppCompatActivity {
 
         EditText name2 = findViewById(R.id.nameEditText);
         EditText id2 = findViewById(R.id.idEditText);
-        EditText call2 = findViewById(R.id.callEditText);
+        EditText phone2 = findViewById(R.id.callEditText);
         EditText katalk2 = findViewById(R.id.katalkEditText);
 
         Spinner spinner = (Spinner)findViewById(R.id.mbti);
@@ -73,7 +73,7 @@ public class WriteSInformation extends AppCompatActivity {
             public void onClick(View v) {
                 name = name2.getText().toString();
                 id = id2.getText().toString();
-                call = call2.getText().toString();
+                phone = phone2.getText().toString();
                 katalk = katalk2.getText().toString();
 
                 postFirebaseDatabase(true);
@@ -89,7 +89,7 @@ public class WriteSInformation extends AppCompatActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         Map<String, Object> postValues = null;
         if(add){
-            FirebasePost post = new FirebasePost(id, name, mbti, call, katalk, status);
+            FirebasePost post = new FirebasePost(id, name, mbti, phone, katalk, status);
             postValues = post.toMap();
         }
         childUpdates.put("/id_list/" + id, postValues);

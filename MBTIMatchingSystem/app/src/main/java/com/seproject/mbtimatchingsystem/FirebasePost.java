@@ -11,7 +11,7 @@ public class FirebasePost {
     public String id;
     public String name;
     public String mbti;
-    public String call;
+    public String phone;
     public String katalk;
     public String status;
 
@@ -23,7 +23,7 @@ public class FirebasePost {
         this.id = id;
         this.name = name;
         this.mbti = mbti;
-        this.call = call;
+        this.phone = call;
         this.katalk = katalk;
         this.status = status;
 
@@ -41,7 +41,7 @@ public class FirebasePost {
         result.put("id", id);
         result.put("name", name);
         result.put("mbti", mbti);
-        result.put("call", call);
+        result.put("phone", phone);
         result.put("katalk", katalk);
         result.put("status", status);
 

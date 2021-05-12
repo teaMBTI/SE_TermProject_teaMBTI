@@ -3,6 +3,7 @@ package com.seproject.mbtimatchingsystem;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -80,6 +81,15 @@ public class WriteSInformation extends AppCompatActivity {
 
                 startLoginActivity(); //정보저장 성공 시 메인 화면으로 이동
                 }
+        });
+
+        Button link = findViewById(R.id.link);
+        link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.16personalities.com"));
+                startActivity(intent);
+            }
         });
 
     }

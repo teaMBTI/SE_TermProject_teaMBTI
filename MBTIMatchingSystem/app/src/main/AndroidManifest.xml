@@ -11,9 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MBTIMatchingSystem">
-        <activity android:name=".PopupAddCourse"></activity>
         <activity android:name=".WriteSInformation" />
         <activity android:name=".WritePInformation" />
+        <activity android:name=".AddCourse" />
         <activity android:name=".ListCourseRoom">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

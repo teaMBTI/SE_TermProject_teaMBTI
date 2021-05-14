@@ -1,5 +1,6 @@
 package com.seproject.mbtimatchingsystem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,34 +10,42 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ListCourseRoom extends AppCompatActivity {
 
+    private FirebaseDatabase database;
     private DatabaseReference mPostReference;
     private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
     private FirebaseUser mFirebaseUser;
-    ImageButton addCourseButton;
-    public String courseNum;
-    public String courseName;
-    public String pf_id;
-    public Button logOutButton;
+    private ChildEventListener mChild;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    List<Object> courseList = new ArrayList<Object>();
 
+    public Button logOutButton;
+    ImageButton addCourseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +64,48 @@ public class ListCourseRoom extends AppCompatActivity {
                 for (UserInfo profile : user.getProviderData()) {
                     // 사용자 닉네임 가져오기
                     String name = profile.getDisplayName();
-
                 }
             }
         }
+
+
+
+        //참고자료 메모
+        //중요_레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
+        /*파이어베이스 데이터 받아서 리스트뷰연결
+        https://angkeum.tistory.com/entry/firebase-android-connect-%ED%8C%8C%EC%9D%B4%EC%96%B4%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EC%97%B0%EA%B2%B0
+        ****  https://steemit.com/kr-dev/@gbgg/firebase-3-firebase
+        */
+
+        //ListView에 목록 세팅
+        ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
+        adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
+        listView.setAdapter(adapter);
+
+
+        database= FirebaseDatabase.getInstance();
+        mPostReference=database.getReference("course_list");
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                adapter.clear();
+
+                for(DataSnapshot messageData : dataSnapshot.getChildren()){
+                   String course_list = messageData.getValue().toString();
+                    courseList.add(course_list);
+                    adapter.add(course_list);
+                }
+                adapter.notifyDataSetChanged();
+                listView.setSelection(adapter.getCount()-1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+
+
 
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {
@@ -70,77 +117,18 @@ public class ListCourseRoom extends AppCompatActivity {
             });
 
 
-            //ListView생성
-            ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
-            //리스트뷰에 버튼을 넣어 버튼클릭시 강좌에 들어갈 수 있게 만든다.
-
-
-            //수업 검색기능을 넣는게 좋을지도<-꼭 구현을 해야할까?
-            String[] CourseNameArray = {"경제학개론", "졸업작품1", "중국어1", "모바일프로그래밍", "소프트웨어공학", "생명과 나눔", "한국사"};
-            //CustomListAdapter whatever = new CustomListAdapter(getActivity(), nameArray, recordArray);
-            //listViewCourseRoom.setAdapter(whatever);
-
-
-            addCourseButton = findViewById(R.id.addCourseButton);
-            /* addCourse button listener */
-            addCourseButton.setOnClickListener(new View.OnClickListener() {
+        addCourseButton = findViewById(R.id.addCourseButton); //강좌개설 버튼
+        /* addCourse button listener */
+        addCourseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showAddCourseDialog(); // AddCourse 팝업창을 띄운다.
-
-
+                    Intent intent = new Intent(getApplicationContext(),AddCourse.class);
+                    startActivity(intent);
+                    // 중첩을 피하기 위해서 다른 activity 로 갈때 quit activity
+                    finish();
+                    //showAddCourseDialog(); // AddCourse 팝업창을 띄운다.
                 }
             });
-
-    }
-
-
-
-
-
-    //참고자료 메모
-    //레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
-    // 다이얼로그 #1  https://m.blog.naver.com/kittoboy/110133796492
-    // 출처: https://saeatechnote.tistory.com/entry/android안드로이드-Login-dialog만들기 [새아의 테크노트]
-
-
-    private void showAddCourseDialog() {
-
-        //add_course_dialog.xml 불러옴
-        LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout addCourseLayout = (LinearLayout) vi.inflate(R.layout.add_course_dialog, null);
-
-        final EditText courseNum2 = (EditText)addCourseLayout.findViewById(R.id.courseNum);
-        final EditText courseName2 = (EditText)addCourseLayout.findViewById(R.id.courseName);
-        final EditText pf_id2 = (EditText)addCourseLayout.findViewById(R.id.pf_id);
-
-        new AlertDialog.Builder(this)
-                .setTitle("과목 추가")
-                .setView(addCourseLayout)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-            @Override public void onClick(DialogInterface dialog, int which) {
-
-                courseNum = courseNum2.getText().toString();
-                courseName = courseName2.getText().toString();
-                pf_id = pf_id2.getText().toString();
-
-                Toast.makeText(ListCourseRoom.this,
-                        "학수번호 : " + courseNum  + "@n과목명 : " +courseName  + "@n교수 교번 : " +pf_id , Toast.LENGTH_SHORT).show(); } }).show();
-
-                 postDBData(true);
-
-    }
-
-    private void postDBData(boolean add) {
-        mPostReference = FirebaseDatabase.getInstance().getReference();
-        Map<String, Object> childUpdates = new HashMap<>();
-        Map<String, Object> postValues = null;
-        if(add){
-            DBData post = new DBData(courseNum, courseName, pf_id);
-            postValues = post.toMap();
-        }
-        childUpdates.put("/course_list/" + courseNum, postValues);
-        mPostReference.updateChildren(childUpdates);
 
     }
 
@@ -152,8 +140,7 @@ public class ListCourseRoom extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
     }
 
-    private void startLoginActivity()
-    {
+    private void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
@@ -163,5 +150,10 @@ public class ListCourseRoom extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-
+    private String cutting(String msg)
+    {
+        //str
+        String result = msg.substring(msg.lastIndexOf("courseNum")+1);
+        return msg;
+    }
 }

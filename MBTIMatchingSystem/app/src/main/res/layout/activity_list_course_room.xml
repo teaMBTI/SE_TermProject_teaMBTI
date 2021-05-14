@@ -31,7 +31,7 @@
     <ListView
         android:id="@+id/listViewCourseRoom"
         android:layout_width="wrap_content"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
         android:layout_below="@+id/courseRoom"
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
@@ -43,16 +43,15 @@
 
     <ImageButton
         android:id="@+id/addCourseButton"
-        android:layout_width="74dp"
-        android:layout_height="74dp"
-        android:layout_alignParentEnd="true"
+        android:layout_width="66dp"
+        android:layout_height="85dp"
+        android:layout_below="@id/listViewCourseRoom"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="300dp"
-        android:layout_marginEnd="35dp"
-        android:layout_marginBottom="37dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="20dp"
         android:background="@android:color/transparent"
-        android:padding="0sp"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
         app:srcCompat="@drawable/plus" />
 
     <Button
@@ -62,7 +61,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="23dp"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="#B1B1B1"
         android:text="로그아웃"
         android:textColor="#FFFFFF"

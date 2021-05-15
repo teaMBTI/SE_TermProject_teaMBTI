@@ -92,7 +92,8 @@ public class ListCourseRoom extends AppCompatActivity {
 
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
                    String course_list = messageData.getValue().toString();
-                    courseList.add(course_list);
+                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
+                   courseList.add(course_list);
                     adapter.add(course_list);
                 }
                 adapter.notifyDataSetChanged();
@@ -144,7 +145,6 @@ public class ListCourseRoom extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
-
     private void startToast(String msg)
     {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -152,8 +152,11 @@ public class ListCourseRoom extends AppCompatActivity {
 
     private String cutting(String msg)
     {
-        //str
-        String result = msg.substring(msg.lastIndexOf("courseNum")+1);
+       String temp = msg;
+        msg = msg.substring(12); //courseName=자르기
+        msg = msg.substring(0,msg.indexOf(", pf_name"));
+        temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기
+        msg = msg+"("+temp+")";
         return msg;
     }
 }

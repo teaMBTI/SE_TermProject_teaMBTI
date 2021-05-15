@@ -172,9 +172,9 @@ public class ListCourseRoom extends AppCompatActivity {
     {
        String temp = msg;
         msg = msg.substring(12); //courseName=자르기
-        msg = msg.substring(0,msg.indexOf(", pf_name"));
+        /*msg = msg.substring(0,msg.indexOf(", pf_name"));
         temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기
-        msg = msg+"("+temp+")";
+        msg = msg+"("+temp+")";*/
         return msg;
     }
 

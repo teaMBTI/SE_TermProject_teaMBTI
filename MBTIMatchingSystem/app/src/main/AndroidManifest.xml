@@ -24,7 +24,7 @@
         <activity android:name=".JoinActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".LoginActivity" />
-<!--        <activity android:name=".ListTeamProject"/>-->
+        <activity android:name=".ListTeamProject"/>
         <activity android:name=".MakeTeam"/>
     </application>
 

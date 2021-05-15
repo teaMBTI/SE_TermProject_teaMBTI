@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -81,6 +83,29 @@ public class ListCourseRoom extends AppCompatActivity {
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
         adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         listView.setAdapter(adapter);
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String course = (String) listView.getItemAtPosition(position);
+                startToast(course);
+
+                Intent NewActivity = new Intent(getApplicationContext(),
+                        com.seproject.mbtimatchingsystem.ListTeamProject.class);
+                NewActivity.putExtra("course", course);
+
+                setResult(RESULT_OK, NewActivity);
+                startActivity(NewActivity);
+
+
+            }
+        });
+
+
+
+
 
 
         database= FirebaseDatabase.getInstance();
@@ -159,4 +184,6 @@ public class ListCourseRoom extends AppCompatActivity {
         msg = msg+"("+temp+")";
         return msg;
     }
+
+
 }

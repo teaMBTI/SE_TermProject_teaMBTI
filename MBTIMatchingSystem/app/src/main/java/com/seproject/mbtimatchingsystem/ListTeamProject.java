@@ -22,48 +22,45 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.w3c.dom.Text;
 
 public class ListTeamProject extends AppCompatActivity {
 
     TextView courseName;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_teamproject);
 
-       courseName = (TextView) findViewById(R.id.course_name);
-
+        courseName = (TextView) findViewById(R.id.course_name);
 
         Intent passedIntent = getIntent();
         if (passedIntent != null) {
             String course = passedIntent.getStringExtra("course");
-            courseName.setText(course);
+            //courseName.setText(course);
         }
-
 
         ImageButton addTeamProject = (ImageButton) findViewById(R.id.addTeamProject);
         addTeamProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent NewActivity = new Intent(getApplicationContext(), MakeTeam.class);
+                Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class);
                 startActivity(NewActivity);
-
             }
         });
 
 
-
-
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView_tp);
 
-        String[] teamProject= {"Team Project 1", "Team Project 2","Team Project 3","Team Project 4","Team Project 5","Team Project 6",
-                "Team Project 7","Team Project 8","Team Project 9","Team Project 10","Team Project 11","Team Project 12","Team Project 13",
-                "Team Project 14","Team Project 15"};
+        String[] teamProject = {"Team Project 1", "Team Project 2", "Team Project 3", "Team Project 4", "Team Project 5", "Team Project 6",
+                "Team Project 7", "Team Project 8", "Team Project 9", "Team Project 10", "Team Project 11", "Team Project 12", "Team Project 13",
+                "Team Project 14", "Team Project 15"};
         ListView listView = (ListView) findViewById(R.id.listView_tp);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, teamProject);
         listView.setAdapter(adapter);
@@ -84,21 +81,10 @@ public class ListTeamProject extends AppCompatActivity {
                 return false;
             }
         });
-
-
     }
 
-    private void startToast(String msg)
-    {
+    private void startToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
-
-
-
-
-
-
-
 
 }

@@ -104,10 +104,6 @@ public class ListCourseRoom extends AppCompatActivity {
         });
 
 
-
-
-
-
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
         mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -150,9 +146,6 @@ public class ListCourseRoom extends AppCompatActivity {
                 public void onClick(View view) {
                     Intent intent = new Intent(getApplicationContext(),AddCourse.class);
                     startActivity(intent);
-                    // 중첩을 피하기 위해서 다른 activity 로 갈때 quit activity
-                    finish();
-                    //showAddCourseDialog(); // AddCourse 팝업창을 띄운다.
                 }
             });
 

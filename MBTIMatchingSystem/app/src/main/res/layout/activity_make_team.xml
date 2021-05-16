@@ -29,7 +29,7 @@
         android:text="최소 팀원 수: "
         android:layout_marginTop="20dp"/>
     <Button
-        android:id="@+id/creatTeam"
+        android:id="@+id/createTeam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

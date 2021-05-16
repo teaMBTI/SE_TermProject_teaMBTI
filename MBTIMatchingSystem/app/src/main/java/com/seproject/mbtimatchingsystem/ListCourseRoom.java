@@ -70,8 +70,6 @@ public class ListCourseRoom extends AppCompatActivity {
             }
         }
 
-
-
         //참고자료 메모
         //중요_레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
         /*파이어베이스 데이터 받아서 리스트뷰연결
@@ -85,17 +83,15 @@ public class ListCourseRoom extends AppCompatActivity {
         listView.setAdapter(adapter);
 
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 누르면
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String course = (String) listView.getItemAtPosition(position);
                 startToast(course);
-
                 Intent NewActivity = new Intent(getApplicationContext(),
                         com.seproject.mbtimatchingsystem.ListTeamProject.class);
                 NewActivity.putExtra("course", course);
-
                 setResult(RESULT_OK, NewActivity);
                 startActivity(NewActivity);
 
@@ -171,10 +167,9 @@ public class ListCourseRoom extends AppCompatActivity {
     private String cutting(String msg)
     {
        String temp = msg;
-        msg = msg.substring(12); //courseName=자르기
-        /*msg = msg.substring(0,msg.indexOf(", pf_name"));
+        msg= msg.substring(msg.indexOf(", courseName")+13,msg.indexOf(", pf_name")); //courseName=자르기
         temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기
-        msg = msg+"("+temp+")";*/
+        msg = msg+"("+temp+")";
         return msg;
     }
 

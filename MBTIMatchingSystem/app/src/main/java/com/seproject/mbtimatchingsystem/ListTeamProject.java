@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,6 +33,7 @@ import org.w3c.dom.Text;
 public class ListTeamProject extends AppCompatActivity {
 
     TextView courseName;
+    Button participate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,28 @@ public class ListTeamProject extends AppCompatActivity {
                 startActivity(NewActivity);
             }
         });
+
+/*        Button participate = (Button) findViewById(R.id.participate);
+        participate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startToast("수업에 참가하셨습니다.");
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                for (UserInfo profile : user.getProviderData()) {
+                    // 사용자 닉네임 가져오기
+                    String name = profile.getDisplayName();
+                }
+                }
+            }
+        });*/
+
+
+
+
+
+
+
 
 
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView_tp);

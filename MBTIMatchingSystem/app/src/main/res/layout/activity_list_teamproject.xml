@@ -28,12 +28,17 @@
             android:layout_height="match_parent"/>
     </ScrollView>
 
+    <Button
+        android:id="@+id/participate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="참가하기"/>
+
     <ImageButton
         android:id="@+id/addTeamProject"
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_marginLeft="340dp"
-
         android:adjustViewBounds="true"
         android:onClick="onClick"
         android:scaleType="fitCenter"

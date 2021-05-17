@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -29,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +51,7 @@ public class ListCourseRoom extends AppCompatActivity {
 
     public Button logOutButton;
     ImageButton addCourseButton;
+    private static final String TAG = "ListCourseRoom";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +116,9 @@ public class ListCourseRoom extends AppCompatActivity {
                 adapter.clear();
 
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
-                   String course_list = messageData.getValue().toString();
+                    String course_list = messageData.getValue().toString();
                     course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
-                   courseList.add(course_list);
+                    courseList.add(course_list);
                     adapter.add(course_list);
                 }
                 adapter.notifyDataSetChanged();
@@ -131,23 +135,23 @@ public class ListCourseRoom extends AppCompatActivity {
 
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseAuth.getInstance().signOut();
-                    startLoginActivity(); //로그아웃되면 로그인 화면으로 이동
-                }
-            });
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                startLoginActivity(); //로그아웃되면 로그인 화면으로 이동
+            }
+        });
 
 
         addCourseButton = findViewById(R.id.addCourseButton); //강좌개설 버튼
         /* addCourse button listener */
         addCourseButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(getApplicationContext(),AddCourse.class);
-                    startActivity(intent);
-                }
-            });
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),AddCourse.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -170,7 +174,7 @@ public class ListCourseRoom extends AppCompatActivity {
 
     private String cutting(String msg)
     {
-       String temp = msg;
+        String temp = msg;
         msg = msg.substring(12); //courseName=자르기
         msg = msg.substring(0,msg.indexOf(", pf_name"));
         temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기

@@ -26,10 +26,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         msg = remoteMessage.getNotification().getBody();
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-        boolean switchOn = sharedPreferences.getBoolean("Key", false);
-        if (switchOn) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, ListCourseRoom.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             //알림 눌렀을때 행위
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ListCourseRoom.class), 0);
@@ -40,11 +37,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     .setAutoCancel(true)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setVibrate(new long[]{1, 1000});
+
             notificationManager.notify(0, mBuilder.build());
             mBuilder.setContentIntent(contentIntent);
-        } else {
-
         }
     }
-}
+
 

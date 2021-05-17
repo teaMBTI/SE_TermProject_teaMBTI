@@ -14,24 +14,28 @@ public class FirebasePost {
     public String phone;
     public String katalk;
     public String status;
+    public String email;
+
 
     public FirebasePost(){
         // Default constructor required for calls to DataSnapshot.getValue(FirebasePost.class)
     }
 
-    public FirebasePost(String id, String name, String mbti, String call, String katalk, String status) {
+    public FirebasePost(String id, String name, String mbti, String call, String katalk, String status, String email) {
         this.id = id;
         this.name = name;
         this.mbti = mbti;
         this.phone = call;
         this.katalk = katalk;
         this.status = status;
+        this.email = email;
 
     }
-    public FirebasePost(String id, String name, String status) {
+    public FirebasePost(String id, String name, String status, String email) {
         this.id = id;
         this.name = name;
         this.status = status;
+        this.email = email;
 
     }
 
@@ -44,6 +48,7 @@ public class FirebasePost {
         result.put("phone", phone);
         result.put("katalk", katalk);
         result.put("status", status);
+        result.put("email", email);
 
         return result;
     }

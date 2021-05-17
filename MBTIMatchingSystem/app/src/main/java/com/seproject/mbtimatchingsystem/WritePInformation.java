@@ -11,6 +11,8 @@ import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -20,15 +22,20 @@ import java.util.Map;
 //test push commit
 public class WritePInformation extends AppCompatActivity {
     private DatabaseReference mPostReference;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
     public String name;
     public String id;
     public CheckBox checkBox;
     public String status;
+    public String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pinfo);
+
+        mFirebaseAuth = FirebaseAuth.getInstance(); //유저를 얻어온다
 
         EditText name2 = findViewById(R.id.nameEditText);
         EditText id2 = findViewById(R.id.idEditText);
@@ -50,6 +57,15 @@ public class WritePInformation extends AppCompatActivity {
                 startLoginActivity(); //정보저장 성공 시 메인 화면으로 이동
             }
         });
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            for (UserInfo profile : user.getProviderData()) {
+                // 사용자 이메일 가져오기
+                email = profile.getEmail();
+
+            }
+        }
     }
 
     public void postFirebaseDatabase(boolean add){
@@ -57,7 +73,7 @@ public class WritePInformation extends AppCompatActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         Map<String, Object> postValues = null;
         if(add){
-            FirebasePost post = new FirebasePost(id, name, status);
+            FirebasePost post = new FirebasePost(id, name, status, email);
             postValues = post.toMap();
         }
         childUpdates.put("/id_list/" + id, postValues);

@@ -109,9 +109,9 @@ public class ListCourseRoom extends AppCompatActivity {
 
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
                    String course_list = messageData.getValue().toString();
-                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
+                   course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
                    courseList.add(course_list);
-                    adapter.add(course_list);
+                   adapter.add(course_list);
                 }
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);

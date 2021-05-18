@@ -16,11 +16,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MakeTeam extends AppCompatActivity {
 
     // 팀 개수 설정은 의미가 없는것 같아서 입력값은 최소 팀원 수만 입력해도 될 것 같아요
     int minmembers = 5;
+    String courseNum = "10177002";
 
     // MBTI 별로 멤버를 저장하기 위한 ArrayList
     /*
@@ -30,7 +32,9 @@ public class MakeTeam extends AppCompatActivity {
      */
 
     // 처음에 전체 인원을 담을 ArrayList
-    ArrayList<String> student_ID = new ArrayList<>();
+    HashMap<String, String> student = new HashMap<>();
+
+    ArrayList<String> mbti = new ArrayList<>();
 
     // NP/NJ/SP/SJ 별로 분류할 ArrayList
     ArrayList<String> NP = new ArrayList<>();
@@ -57,7 +61,7 @@ public class MakeTeam extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         btn = (Button) findViewById(R.id.createTeam);
 
-        mDatabase.child("id_list").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        mDatabase.child("id_list").child(courseNum).child("st_Participate_id").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
@@ -65,12 +69,16 @@ public class MakeTeam extends AppCompatActivity {
                 }
                 else {
 
-                    // Object를 받아서 학생들의 학번을 ArrayList에 넣는 부분 구현해야함
+                    String readstr = String.valueOf(task.getResult().getValue());
 
-                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+
+
+
                 }
             }
         });
+
+
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,8 +87,8 @@ public class MakeTeam extends AppCompatActivity {
                  * 1. NP/NJ/SP/SJ 별로 인원 분류 후 팀 매칭
                  * 처음에 모든 인원을 담아놓은 MBTI에서 멤버별로 분류하는 부분
                  */
-                while (student_ID.size() != 0) {
-                    String temp = student_ID.get(0);
+                while (mbti.size() != 0) {
+                    String temp = mbti.get(0);
 
                     if (temp.substring(3, 4).equals("P")) {
                         if (temp.substring(1, 2).equals("N"))
@@ -94,7 +102,7 @@ public class MakeTeam extends AppCompatActivity {
                             SJ.add(temp);
                     }
 
-                    student_ID.remove(0);
+                    mbti.remove(0);
                 }
 
 
@@ -234,6 +242,8 @@ public class MakeTeam extends AppCompatActivity {
 
             }
         });
+
+
 
     }
 }

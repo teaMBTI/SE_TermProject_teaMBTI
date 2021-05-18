@@ -27,6 +27,7 @@
         <activity android:name=".ListTeamProject"/>
         <activity android:name=".AddTeamProject" />
         <activity android:name=".MakeTeam"/>
+        <activity android:name=".TeamView"/>
 
         <service android:name=".FirebaseMessagingService">
             <intent-filter>

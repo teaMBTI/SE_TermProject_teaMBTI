@@ -35,6 +35,12 @@ public class ListTeamProject extends AppCompatActivity {
     TextView courseName;
     Button participate;
 
+    String id;
+    String status;
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +54,42 @@ public class ListTeamProject extends AppCompatActivity {
             //courseName.setText(course);
         }
 
+        // +버튼 이벤트 핸들러
         ImageButton addTeamProject = (ImageButton) findViewById(R.id.addTeamProject);
         addTeamProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+//                mFirebaseAuth = FirebaseAuth.getInstance(); //유저를 얻어온다
+//                mFirebaseUser = mFirebaseAuth.getCurrentUser();//혹시 인증 유지가 안될 수 있으니 유저 확인
+                DatabaseReference mDatabase;
+                mFirebaseAuth = FirebaseAuth.getInstance();
+
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    for (UserInfo profile : user.getProviderData()) {
+//                        // 사용자 이름 가져오기
+//                        String name = profile.getDisplayName();
+//                        String email = profile.getEmail();
+//                        startToast(name +" "+ email);
+                        String uid = user!= null ? user.getUid(): null;
+
+
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("id_list").child(uid).child("email")
+
+
+
+                    }
+                }
+
+
+
+
                 Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class);
                 startActivity(NewActivity);
+
+
             }
         });
 
@@ -83,8 +119,7 @@ public class ListTeamProject extends AppCompatActivity {
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView_tp);
 
         String[] teamProject = {"Team Project 1", "Team Project 2", "Team Project 3", "Team Project 4", "Team Project 5", "Team Project 6",
-                "Team Project 7", "Team Project 8", "Team Project 9", "Team Project 10", "Team Project 11", "Team Project 12", "Team Project 13",
-                "Team Project 14", "Team Project 15"};
+                "Team Project 7", "Team Project 8"};
         ListView listView = (ListView) findViewById(R.id.listView_tp);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, teamProject);
         listView.setAdapter(adapter);

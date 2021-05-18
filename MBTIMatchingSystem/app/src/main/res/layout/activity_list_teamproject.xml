@@ -18,7 +18,7 @@
     <ScrollView
         android:id="@+id/scrollView_tp"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
+        android:layout_height="400dp"
         android:fillViewport="true"
         android:layout_marginTop="20dp" >
 
@@ -44,8 +44,6 @@
         android:scaleType="fitCenter"
         android:src="@drawable/plus"
         app:backgroundTint="@color/white"
-        tools:ignore="MissingConstraints"
-
-        />
+        tools:ignore="MissingConstraints" />
 
 </LinearLayout>

@@ -17,6 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -25,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +48,8 @@ public class ListTeamProject extends AppCompatActivity {
     String nowCourseNum;
     String nowMbti;
     List<Object> emailList = new ArrayList<Object>();
+    private static final String TAG = "ListCourseRoom";
+    String topic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +61,7 @@ public class ListTeamProject extends AppCompatActivity {
         Intent passedIntent = getIntent();
         if (passedIntent != null) {
             String course = passedIntent.getStringExtra("course");
-            //courseName.setText(course);
+            courseName.setText(course);
             nowCourseNum = cuttingCourseNum(course);
         }
 
@@ -69,6 +74,19 @@ public class ListTeamProject extends AppCompatActivity {
             }
         });
 
+        String course = courseName.getText().toString();
+        if(course.contains("소프트웨어공학")){
+            topic = "SE";
+        }else if(course.contains("데이터과학"))
+        {
+            topic = "DS";
+        }else if(course.equals("모바일 프로그래밍(10178001)"))
+        {
+            topic = "MP1";
+        }else if(course.equals("모바일 프로그래밍(10178002)"))
+        {
+            topic = "MP2";
+        }
 
         participate = findViewById(R.id.participate); //참가하기
         participate.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +94,67 @@ public class ListTeamProject extends AppCompatActivity {
             public void onClick(View view) {
                 startToast("수업에 참가하셨습니다.");
                 readEmailAndPutId();
+
+                if(topic.equals("SE"))
+                {
+                    FirebaseMessaging.getInstance().subscribeToTopic("SE")
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    String msg = "Subscribed to SE";
+                                    if (!task.isSuccessful()) {
+                                        msg = "Failed to subscribe to SE";
+                                    }
+                                    Log.d(TAG, msg);
+                                    Toast.makeText(ListTeamProject.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+                if(topic.equals("DS"))
+                {
+                    FirebaseMessaging.getInstance().subscribeToTopic("DS")
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    String msg = "Subscribed to DS";
+                                    if (!task.isSuccessful()) {
+                                        msg = "Failed to subscribe to DS";
+                                    }
+                                    Log.d(TAG, msg);
+                                    Toast.makeText(ListTeamProject.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+                if(topic.equals("MP1"))
+                {
+                    FirebaseMessaging.getInstance().subscribeToTopic("MP1")
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    String msg = "Subscribed to MP1";
+                                    if (!task.isSuccessful()) {
+                                        msg = "Failed to subscribe to MP1";
+                                    }
+                                    Log.d(TAG, msg);
+                                    Toast.makeText(ListTeamProject.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+                if(topic.equals("MP2"))
+                {
+                    FirebaseMessaging.getInstance().subscribeToTopic("MP2")
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    String msg = "Subscribed to MP2";
+                                    if (!task.isSuccessful()) {
+                                        msg = "Failed to subscribe to MP2";
+                                    }
+                                    Log.d(TAG, msg);
+                                    Toast.makeText(ListTeamProject.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
         });
 
@@ -106,8 +185,6 @@ public class ListTeamProject extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void readEmailAndPutId() {
 

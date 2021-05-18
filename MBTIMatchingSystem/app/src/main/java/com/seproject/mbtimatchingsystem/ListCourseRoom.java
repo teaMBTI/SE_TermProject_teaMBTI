@@ -141,7 +141,7 @@ public class ListCourseRoom extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
-        
+
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {
                 @Override

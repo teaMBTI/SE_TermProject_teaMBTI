@@ -47,12 +47,9 @@ public class ListTeamProject extends AppCompatActivity {
     String nowEmail;
     String nowCourseNum;
     String nowMbti;
-<<<<<<< HEAD
-=======
     List<Object> emailList = new ArrayList<Object>();
     private static final String TAG = "ListCourseRoom";
     String topic;
->>>>>>> fd1dd819752e015c2286a6118e95137c7f2bd03e
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

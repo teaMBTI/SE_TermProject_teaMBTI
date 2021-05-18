@@ -43,6 +43,7 @@ public class ListTeamProject extends AppCompatActivity {
     String nowId;
     String nowEmail;
     String nowCourseNum;
+    String nowMbti;
     List<Object> emailList = new ArrayList<Object>();
 
     @Override
@@ -127,31 +128,38 @@ public class ListTeamProject extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     id_listEmail = snapshot.getValue().toString();
+                    Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
                     nowId =id_listEmail;
+                    nowMbti =id_listEmail;
                     id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
 
                     if(nowEmail.equals(id_listEmail)) {
-                        nowId =cuttingId(nowId);;
+                        nowId =cuttingId(nowId);
+                        nowMbti=cuttingMbti(nowMbti);
                         Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
+                        Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
                         break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
                     }
+
+
                 }
                 DatabaseReference courseRef = database.getReference().child("course_list");
-                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowId);
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowMbti).setValue(nowId);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
-
+    private String cuttingMbti(String msg) { //MBTI만 자르기
+        msg=msg.substring(msg.indexOf(", mbti=")+7, msg.indexOf(", id"));
+        return msg;
+    }
     private String cuttingId(String msg) {//학번만 자르기
-        String temp = msg;
         msg= msg.substring(msg.indexOf(", id=")+5,msg.indexOf(", email"));
         return msg;
     }
     private String cuttingEmail(String msg) {//이메일만 자르기
-        String temp = msg;
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
         return msg;
     }

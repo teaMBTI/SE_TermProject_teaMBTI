@@ -144,7 +144,7 @@ public class ListTeamProject extends AppCompatActivity {
 
                 }
                 DatabaseReference courseRef = database.getReference().child("course_list");
-                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowMbti).setValue(nowId);
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }

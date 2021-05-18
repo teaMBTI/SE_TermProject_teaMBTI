@@ -15,37 +15,43 @@
         android:textSize="24sp"
         android:layout_marginTop="30dp"
         android:layout_gravity="center"/>
-    <ScrollView
-        android:id="@+id/scrollView_tp"
-        android:layout_width="match_parent"
-        android:layout_height="550dp"
-        android:fillViewport="true"
-        android:layout_marginTop="20dp" >
-
-        <ListView
-            android:id="@+id/listView_tp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </ScrollView>
 
     <Button
         android:id="@+id/participate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="참가하기"/>
+        android:layout_gravity="right"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:backgroundTint="#3DC68F"
+        android:text="참가하기"
+        app:cornerRadius="30dp" />
+
+    <ScrollView
+        android:id="@+id/scrollView_tp"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_marginTop="20dp"
+        android:fillViewport="true">
+
+        <ListView
+            android:id="@+id/listView_tp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
 
     <ImageButton
         android:id="@+id/addTeamProject"
         android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:layout_marginLeft="340dp"
+        android:layout_height="85dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="30dp"
         android:adjustViewBounds="true"
         android:onClick="onClick"
         android:scaleType="fitCenter"
         android:src="@drawable/plus"
-        app:backgroundTint="@color/white"
-        tools:ignore="MissingConstraints"
 
-        />
+        app:backgroundTint="@color/white"
+        tools:ignore="MissingConstraints" />
 
 </LinearLayout>

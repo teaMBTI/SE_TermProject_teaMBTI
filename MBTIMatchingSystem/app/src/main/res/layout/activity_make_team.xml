@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -28,12 +29,15 @@
         android:layout_height="wrap_content"
         android:text="최소 팀원 수: "
         android:layout_marginTop="20dp"/>
+
     <Button
         android:id="@+id/createTeam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
-        android:text="팀 만들기"/>
+        android:backgroundTint="#3DC68F"
+        android:text="팀 만들기"
+        app:cornerRadius="30dp" />
 
 </LinearLayout>

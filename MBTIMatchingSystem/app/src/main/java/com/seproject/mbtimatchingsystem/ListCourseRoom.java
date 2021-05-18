@@ -1,22 +1,16 @@
 package com.seproject.mbtimatchingsystem;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,21 +25,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ListCourseRoom extends AppCompatActivity {
 
     private FirebaseDatabase database;
     private DatabaseReference mPostReference;
+    private DatabaseReference ref;
     private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
     private FirebaseUser mFirebaseUser;
     private ChildEventListener mChild;
     private ListView listView;
     private ArrayAdapter<String> adapter;
     List<Object> courseList = new ArrayList<Object>();
-
+    String nowEmail;
+    String id_listEmail;
+    String nowStatus;
     public Button logOutButton;
     ImageButton addCourseButton;
 
@@ -94,19 +89,16 @@ public class ListCourseRoom extends AppCompatActivity {
                 NewActivity.putExtra("course", course);
                 setResult(RESULT_OK, NewActivity);
                 startActivity(NewActivity);
-
-
             }
         });
 
 
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //리스트뷰(강좌목록)보여줌
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adapter.clear();
-
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
                    String course_list = messageData.getValue().toString();
                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
@@ -116,15 +108,40 @@ public class ListCourseRoom extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
 
 
-
-
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        int i=0;
+        for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
+            String currentUserEmail = profile.getUid();
+            if(i==1)
+                nowEmail=currentUserEmail;
+            i++;
+        }
+        database= FirebaseDatabase.getInstance();
+        ref=database.getReference("id_list");
+        ref.addValueEventListener(new ValueEventListener() {   //addCourse버튼 눌렀을시 유저의 status불러옴
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    id_listEmail = snapshot.getValue().toString();
+                    nowStatus =id_listEmail;
+                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                    if(nowEmail.equals(id_listEmail)) {
+                        nowStatus =cuttingStatus(nowStatus);
+                        Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
+                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+        
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,18 +151,23 @@ public class ListCourseRoom extends AppCompatActivity {
                 }
             });
 
-
         addCourseButton = findViewById(R.id.addCourseButton); //강좌개설 버튼
         /* addCourse button listener */
         addCourseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getApplicationContext(),AddCourse.class);
-                    startActivity(intent);
+                   /* statusCheck();//상태를 가져온다*/
+                    if(nowStatus.equals("Professor")){
+                        Intent intent = new Intent(getApplicationContext(),AddCourse.class);
+                        startActivity(intent);
+                    }
+                    else
+                        startToast("학생은 강좌 개설 권한이 없습니다.");
                 }
             });
-
     }
+
+
 
     @Override
     //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
@@ -160,16 +182,20 @@ public class ListCourseRoom extends AppCompatActivity {
         startActivity(intent);
     }
     private void startToast(String msg)
-    {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
+    { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 
-    private String cutting(String msg)
-    {
-       String temp = msg;
+    private String cutting(String msg) //소프트웨어공학(10177002)
+    { String temp = msg;
         msg= msg.substring(msg.indexOf(", courseName")+13,msg.indexOf(", pf_name")); //courseName=자르기
         temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기
         msg = msg+"("+temp+")";
+        return msg; }
+    private String cuttingStatus(String msg) { //Status만 자르기
+        msg= msg.substring(msg.indexOf(", status=")+9,msg.indexOf("}"));
+        return msg;
+    }
+    private String cuttingEmail(String msg) {//이메일만 자르기
+        msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
         return msg;
     }
 

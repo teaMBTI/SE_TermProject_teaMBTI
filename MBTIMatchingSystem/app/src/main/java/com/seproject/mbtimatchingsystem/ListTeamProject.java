@@ -44,7 +44,6 @@ public class ListTeamProject extends AppCompatActivity {
     String nowEmail;
     String nowCourseNum;
     String nowMbti;
-    List<Object> emailList = new ArrayList<Object>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +127,7 @@ public class ListTeamProject extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     id_listEmail = snapshot.getValue().toString();
-                    Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
+                    //Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
                     nowId =id_listEmail;
                     nowMbti =id_listEmail;
                     id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
@@ -136,15 +135,13 @@ public class ListTeamProject extends AppCompatActivity {
                     if(nowEmail.equals(id_listEmail)) {
                         nowId =cuttingId(nowId);
                         nowMbti=cuttingMbti(nowMbti);
-                        Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
-                        Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
+                       // Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
+                       // Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
                         break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
                     }
-
-
                 }
                 DatabaseReference courseRef = database.getReference().child("course_list");
-                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti);
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //학번,mbti 데이터쓰기
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
@@ -163,7 +160,7 @@ public class ListTeamProject extends AppCompatActivity {
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
         return msg;
     }
-    private String cuttingCourseNum(String msg) { //해당 강좌 할수번호만 자르기
+    private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
         msg= msg.substring(msg.indexOf("(")+1,msg.indexOf(")"));
         return msg;
     }

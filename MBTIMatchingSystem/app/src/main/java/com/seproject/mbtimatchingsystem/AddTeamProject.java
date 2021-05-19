@@ -35,18 +35,28 @@ public class AddTeamProject extends AppCompatActivity {
     public String buff2;
     public int totalStuNum;
     public int teamNum;
+
     EditText edit_courseNum;
     EditText edit_TPName;
     EditText edit_totalStuNum;
     EditText edit_teamNum;
     Button doneBtn;
 
+    String course_num;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_teamproject);
 
+        Intent passedIntent = getIntent();
+        if (passedIntent != null) {
+            course_num = passedIntent.getStringExtra("courseNum");
+
+        }
+
         edit_courseNum = findViewById(R.id.courseNum);
+        edit_courseNum.setText(course_num);
         edit_TPName = findViewById(R.id.TPName);
         edit_totalStuNum = findViewById(R.id.totalStuNum);
         edit_teamNum = findViewById(R.id.teamNum);

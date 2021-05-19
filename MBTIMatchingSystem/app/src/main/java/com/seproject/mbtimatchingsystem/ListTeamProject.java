@@ -38,8 +38,9 @@ public class ListTeamProject extends AppCompatActivity {
 
     private FirebaseDatabase database;
     private DatabaseReference mPostReference;
-    private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
+    private FirebaseAuth mAuth;
     private FirebaseUser mFirebaseUser;
+    private DatabaseReference ref;
     TextView courseName;
     Button participate;
     String id_listEmail;
@@ -49,9 +50,11 @@ public class ListTeamProject extends AppCompatActivity {
     String nowMbti;
 
     String nowStatus;
+    String course;
 
-
-
+    ListView listView;
+    ArrayAdapter<String> adapter;
+    List<Object> tpList = new ArrayList<Object>();
 
     List<Object> emailList = new ArrayList<Object>();
     private static final String TAG = "ListCourseRoom";
@@ -66,36 +69,64 @@ public class ListTeamProject extends AppCompatActivity {
 
         Intent passedIntent = getIntent();
         if (passedIntent != null) {
-            String course = passedIntent.getStringExtra("course");
+            course = passedIntent.getStringExtra("course");
             courseName.setText(course);
             nowCourseNum = cuttingCourseNum(course);
         }
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        int i = 0;
+        for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
+            String currentUserEmail = profile.getUid();
+            if (i == 1)
+                nowEmail = currentUserEmail;
+            i++;
+        }
+        database = FirebaseDatabase.getInstance();
+        ref = database.getReference("id_list");
+        ref.addValueEventListener(new ValueEventListener() {   //addTeamProject 버튼 눌렀을시 유저의 status불러옴
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    id_listEmail = snapshot.getValue().toString();
+                    nowStatus = id_listEmail;
+                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                    if (nowEmail.equals(id_listEmail)) {
+                        nowStatus = cuttingStatus(nowStatus);
+                        Log.e("MMMYYTAGG", "현재 유저 상태: " + nowStatus);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
 
         ImageButton addTeamProject = (ImageButton) findViewById(R.id.addTeamProject); //팀프로젝트 생성
         addTeamProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkStatus();
-                if(nowStatus.equals("Professor")){
-                    Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class);
+                if (nowStatus.equals("Professor")) { //교수 계정인 경우
+                    Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class); //팀프로젝트 생성 화면으로 이동
+                    NewActivity.putExtra("courseNum", nowCourseNum);
+                    setResult(RESULT_OK, NewActivity);
                     startActivity(NewActivity);
-                }
-                else
-                    startToast("학생은 팀프로젝트 개설 권한이 없습니다.");
+                } else
+                    startToast("학생은 팀프로젝트 생성 권한이 없습니다.");
             }
         });
 
         String course = courseName.getText().toString();
-        if(course.contains("소프트웨어공학")){
+        if (course.contains("소프트웨어공학")) {
             topic = "SE";
-        }else if(course.contains("데이터과학"))
-        {
+        } else if (course.contains("데이터과학")) {
             topic = "DS";
-        }else if(course.equals("모바일 프로그래밍(10178001)"))
-        {
+        } else if (course.equals("모바일 프로그래밍(10178001)")) {
             topic = "MP1";
-        }else if(course.equals("모바일 프로그래밍(10178002)"))
-        {
+        } else if (course.equals("모바일 프로그래밍(10178002)")) {
             topic = "MP2";
         }
 
@@ -106,8 +137,7 @@ public class ListTeamProject extends AppCompatActivity {
                 startToast("수업에 참가하셨습니다.");
                 readEmailAndPutId();
 
-                if(topic.equals("SE"))
-                {
+                if (topic.equals("SE")) {
                     FirebaseMessaging.getInstance().subscribeToTopic("SE")
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -121,8 +151,7 @@ public class ListTeamProject extends AppCompatActivity {
                                 }
                             });
                 }
-                if(topic.equals("DS"))
-                {
+                if (topic.equals("DS")) {
                     FirebaseMessaging.getInstance().subscribeToTopic("DS")
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -136,8 +165,7 @@ public class ListTeamProject extends AppCompatActivity {
                                 }
                             });
                 }
-                if(topic.equals("MP1"))
-                {
+                if (topic.equals("MP1")) {
                     FirebaseMessaging.getInstance().subscribeToTopic("MP1")
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -151,8 +179,7 @@ public class ListTeamProject extends AppCompatActivity {
                                 }
                             });
                 }
-                if(topic.equals("MP2"))
-                {
+                if (topic.equals("MP2")) {
                     FirebaseMessaging.getInstance().subscribeToTopic("MP2")
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -172,25 +199,43 @@ public class ListTeamProject extends AppCompatActivity {
 
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView_tp);
 
-        String[] teamProject = {"Team Project 1", "Team Project 2", "Team Project 3", "Team Project 4", "Team Project 5", "Team Project 6",
-                "Team Project 7", "Team Project 8", "Team Project 9", "Team Project 10", "Team Project 11", "Team Project 12", "Team Project 13",
-                "Team Project 14", "Team Project 15"};
-        ListView listView = (ListView) findViewById(R.id.listView_tp);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, teamProject);
+        listView = (ListView) findViewById(R.id.listView_tp);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //팀프로젝트 리스트뷰 아이템 클릭시
                 String strText = (String) listView.getItemAtPosition(position);
-                //Toast.makeText(, strText, Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(getApplicationContext(), TeamView.class);
-                intent.putExtra("tpname",strText);
-                intent.putExtra("coursenum",nowCourseNum);
+                Intent intent = new Intent(getApplicationContext(), TeamView.class); //TeamView 화면으로 이동
+                intent.putExtra("tpname", strText);
+                intent.putExtra("coursenum", nowCourseNum);
                 setResult(RESULT_OK, intent);
                 startActivity(intent);
 
+            }
+        });
+
+
+        database = FirebaseDatabase.getInstance();
+        mPostReference = database.getReference("course_list/" + nowCourseNum + "/teamprojectlist");
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //Firebase로부터 읽어온 팀프로젝트 목록 보여줌
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                adapter.clear();
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) { // child 내에 있는 데이터만큼 반복
+                    String tp_list = messageData.getValue().toString(); //getValue()하면 TPName, teamNum, totalStuNum 모두 가져옴
+                    tp_list = cuttingTPName(tp_list); //문자열에서 TPName만 잘라 얻어오는 함수
+                    tpList.add(tp_list); //list array에 추가
+                    adapter.add(tp_list);
+                }
+                adapter.notifyDataSetChanged();
+                listView.setSelection(adapter.getCount() - 1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
 
@@ -207,17 +252,17 @@ public class ListTeamProject extends AppCompatActivity {
     private void readEmailAndPutId() {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        int i=0;
+        int i = 0;
         for (UserInfo profile : user.getProviderData()) {
             // 현재 사용자 이메일 가져오기
             String currentUserEmail = profile.getUid();
-            if(i==1) {
-                nowEmail=currentUserEmail;
+            if (i == 1) {
+                nowEmail = currentUserEmail;
             }
             i++;
         }
-        database= FirebaseDatabase.getInstance();
-        mPostReference=database.getReference("id_list");
+        database = FirebaseDatabase.getInstance();
+        mPostReference = database.getReference("id_list");
         mPostReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -225,16 +270,13 @@ public class ListTeamProject extends AppCompatActivity {
                     id_listEmail = snapshot.getValue().toString();
                     //Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
 
-
-
-
-                    nowId =id_listEmail;
-                    nowMbti =id_listEmail;
+                    nowId = id_listEmail;
+                    nowMbti = id_listEmail;
                     id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
 
-                    if(nowEmail.equals(id_listEmail)) {
-                        nowId =cuttingId(nowId);
-                        nowMbti=cuttingMbti(nowMbti);
+                    if (nowEmail.equals(id_listEmail)) {
+                        nowId = cuttingId(nowId);
+                        nowMbti = cuttingMbti(nowMbti);
 
                         // Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
                         // Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
@@ -244,76 +286,54 @@ public class ListTeamProject extends AppCompatActivity {
                 DatabaseReference courseRef = database.getReference().child("course_list");
                 courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //학번,mbti 데이터쓰기
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-    }
-
-
-    private void checkStatus() {
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        for (UserInfo profile : user.getProviderData()) {
-            // 현재 사용자 이메일 가져오기
-            String currentUserEmail = profile.getUid();
-
-                nowEmail=currentUserEmail;
-                Log.e("MMMYYTAGG", "listInfo: " + nowEmail);
-
-        }
-        database= FirebaseDatabase.getInstance();
-        mPostReference=database.getReference("id_list");
-        mPostReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    id_listEmail = snapshot.getValue().toString();
-                    Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
-
-                    nowStatus =id_listEmail;
-
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
-
-                    if(nowEmail.equals(id_listEmail)) {
-                        nowStatus =cuttingStatus(nowStatus);
-                        Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
-
-                        //break;
-                    }
-                }
+            public void onCancelled(@NonNull DatabaseError error) {
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
+
+    private String cuttingTPName(String msg) { //TPName만 자르기
+        msg = msg.substring(msg.indexOf("TPName=") + 7, msg.indexOf(", teamNum"));
+        return msg;
+    }
 
     private String cuttingMbti(String msg) { //MBTI만 자르기
-        msg=msg.substring(msg.indexOf(", mbti=")+7, msg.indexOf(", id"));
+        msg = msg.substring(msg.indexOf(", mbti=") + 7, msg.indexOf(", id"));
         return msg;
     }
+
     private String cuttingId(String msg) {//학번만 자르기
-        msg= msg.substring(msg.indexOf(", id=")+5,msg.indexOf(", email"));
+        msg = msg.substring(msg.indexOf(", id=") + 5, msg.indexOf(", email"));
         return msg;
     }
+
     private String cuttingEmail(String msg) {//이메일만 자르기
-        msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
+        msg = msg.substring(msg.indexOf(", email=") + 8, msg.indexOf(", status"));
         return msg;
     }
 
     private String cuttingStatus(String msg) { //Status만 자르기
-        msg= msg.substring(msg.indexOf(", status=")+9,msg.indexOf("}"));
+        msg = msg.substring(msg.indexOf(", status=") + 9, msg.indexOf("}"));
         return msg;
     }
 
 
-
-
+    private String cutting(String msg) //소프트웨어공학(10177002)
+    {
+        String temp = msg;
+        msg = msg.substring(msg.indexOf(", courseName") + 13, msg.indexOf(", pf_name")); //courseName=자르기
+        temp = temp.substring(temp.indexOf(", courseNum") + 12, temp.indexOf(", pf_id")); //course_num 자르기
+        msg = msg + "(" + temp + ")";
+        return msg;
+    }
 
     private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
-        msg= msg.substring(msg.indexOf("(")+1,msg.indexOf(")"));
+        msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
+
     private void startToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }

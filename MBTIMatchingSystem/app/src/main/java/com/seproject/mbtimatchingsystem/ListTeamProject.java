@@ -173,6 +173,13 @@ public class ListTeamProject extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String strText = (String) listView.getItemAtPosition(position);
                 //Toast.makeText(, strText, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), TeamView.class);
+                intent.putExtra("tpname",strText);
+                intent.putExtra("coursenum",nowCourseNum);
+                setResult(RESULT_OK, intent);
+                startActivity(intent);
+
             }
         });
 

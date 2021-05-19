@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,6 +14,7 @@
         android:gravity="center_horizontal"
         android:layout_marginTop="30dp"/>
     <TextView
+        android:id="@+id/tpname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -20,14 +22,16 @@
         android:gravity="center_horizontal"
         android:layout_marginTop="20dp"/>
     <EditText
+        android:id="@+id/wholemember"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="총 학생수: "
+        android:hint="총 학생수: "
         android:layout_marginTop="30dp"/>
     <EditText
+        android:id="@+id/minmember"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="최소 팀원 수: "
+        android:hint="최소 팀원 수: "
         android:layout_marginTop="20dp"/>
 
     <Button
@@ -39,5 +43,6 @@
         android:backgroundTint="#3DC68F"
         android:text="팀 만들기"
         app:cornerRadius="30dp" />
+
 
 </LinearLayout>

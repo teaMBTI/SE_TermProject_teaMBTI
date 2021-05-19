@@ -47,6 +47,12 @@ public class ListTeamProject extends AppCompatActivity {
     String nowEmail;
     String nowCourseNum;
     String nowMbti;
+
+    String nowStatus;
+
+
+
+
     List<Object> emailList = new ArrayList<Object>();
     private static final String TAG = "ListCourseRoom";
     String topic;
@@ -69,8 +75,13 @@ public class ListTeamProject extends AppCompatActivity {
         addTeamProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class);
-                startActivity(NewActivity);
+                checkStatus();
+                if(nowStatus.equals("Professor")){
+                    Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class);
+                    startActivity(NewActivity);
+                }
+                else
+                    startToast("학생은 팀프로젝트 개설 권한이 없습니다.");
             }
         });
 
@@ -200,12 +211,16 @@ public class ListTeamProject extends AppCompatActivity {
         }
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("id_list");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mPostReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     id_listEmail = snapshot.getValue().toString();
                     //Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
+
+
+
+
                     nowId =id_listEmail;
                     nowMbti =id_listEmail;
                     id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
@@ -213,8 +228,9 @@ public class ListTeamProject extends AppCompatActivity {
                     if(nowEmail.equals(id_listEmail)) {
                         nowId =cuttingId(nowId);
                         nowMbti=cuttingMbti(nowMbti);
-                       // Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
-                       // Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
+
+                        // Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
+                        // Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
                         break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
                     }
                 }
@@ -225,6 +241,45 @@ public class ListTeamProject extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
+
+
+    private void checkStatus() {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        for (UserInfo profile : user.getProviderData()) {
+            // 현재 사용자 이메일 가져오기
+            String currentUserEmail = profile.getUid();
+
+                nowEmail=currentUserEmail;
+                Log.e("MMMYYTAGG", "listInfo: " + nowEmail);
+
+        }
+        database= FirebaseDatabase.getInstance();
+        mPostReference=database.getReference("id_list");
+        mPostReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    id_listEmail = snapshot.getValue().toString();
+                    Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
+
+                    nowStatus =id_listEmail;
+
+                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+
+                    if(nowEmail.equals(id_listEmail)) {
+                        nowStatus =cuttingStatus(nowStatus);
+                        Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
+
+                        //break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
 
     private String cuttingMbti(String msg) { //MBTI만 자르기
         msg=msg.substring(msg.indexOf(", mbti=")+7, msg.indexOf(", id"));
@@ -238,6 +293,16 @@ public class ListTeamProject extends AppCompatActivity {
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
         return msg;
     }
+
+    private String cuttingStatus(String msg) { //Status만 자르기
+        msg= msg.substring(msg.indexOf(", status=")+9,msg.indexOf("}"));
+        return msg;
+    }
+
+
+
+
+
     private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
         msg= msg.substring(msg.indexOf("(")+1,msg.indexOf(")"));
         return msg;

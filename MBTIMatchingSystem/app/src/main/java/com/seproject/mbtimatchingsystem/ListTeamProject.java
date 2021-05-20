@@ -211,6 +211,7 @@ public class ListTeamProject extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), TeamView.class); //TeamView 화면으로 이동
                 intent.putExtra("tpname", strText);
                 intent.putExtra("coursenum", nowCourseNum);
+                intent.putExtra("status", nowStatus);
                 setResult(RESULT_OK, intent);
                 startActivity(intent);
 

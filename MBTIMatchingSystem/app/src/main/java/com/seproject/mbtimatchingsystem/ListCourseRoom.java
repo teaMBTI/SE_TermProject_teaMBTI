@@ -16,6 +16,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -25,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +51,8 @@ public class ListCourseRoom extends AppCompatActivity {
     String id_listEmail;
     public Button logOutButton;
     ImageButton addCourseButton;
+    private static final String TAG = "ListCourseRoom";
+    String topic = "null";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,6 @@ public class ListCourseRoom extends AppCompatActivity {
         adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         listView.setAdapter(adapter);
 
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 누르면
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -91,7 +95,74 @@ public class ListCourseRoom extends AppCompatActivity {
                                 readEmailAndPutId(); //db st_participate_id에 입력
                                 String course = (String) listView.getItemAtPosition(position);
                                 startToast(course);
+
+                                if (course.contains("소프트웨어공학")) {
+                                    topic = "SE";
+                                } else if (course.contains("데이터과학")) {
+                                    topic = "DS";
+                                } else if (course.equals("모바일프로그래밍(10178001)")) {
+                                    topic = "MP1";
+                                } else if (course.equals("모바일프로그래밍(10178002)")) {
+                                    topic = "MP2";
+                                }
                                 nowCourseNum=cuttingCourseNum(course);
+                                if (topic.equals("SE")) {
+                                    FirebaseMessaging.getInstance().subscribeToTopic("SE")
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    String msg = "Subscribed to SE";
+                                                    if (!task.isSuccessful()) {
+                                                        msg = "Failed to subscribe to SE";
+                                                    }
+                                                    Log.d(TAG, msg);
+                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                                if (topic.equals("DS")) {
+                                    FirebaseMessaging.getInstance().subscribeToTopic("DS")
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    String msg = "Subscribed to DS";
+                                                    if (!task.isSuccessful()) {
+                                                        msg = "Failed to subscribe to DS";
+                                                    }
+                                                    Log.d(TAG, msg);
+                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                                if (topic.equals("MP1")) {
+                                    FirebaseMessaging.getInstance().subscribeToTopic("MP1")
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    String msg = "Subscribed to MP1";
+                                                    if (!task.isSuccessful()) {
+                                                        msg = "Failed to subscribe to MP1";
+                                                    }
+                                                    Log.d(TAG, msg);
+                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                                if (topic.equals("MP2")) {
+                                    FirebaseMessaging.getInstance().subscribeToTopic("MP2")
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    String msg = "Subscribed to MP2";
+                                                    if (!task.isSuccessful()) {
+                                                        msg = "Failed to subscribe to MP2";
+                                                    }
+                                                    Log.d(TAG, msg);
+                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+
                                 Intent NewActivity = new Intent(getApplicationContext(),
                                 com.seproject.mbtimatchingsystem.ListTeamProject.class);
                                 NewActivity.putExtra("course", course);
@@ -123,6 +194,7 @@ public class ListCourseRoom extends AppCompatActivity {
                     course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
                     courseList.add(course_list);
                     adapter.add(course_list);
+
                 }
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);
@@ -131,9 +203,6 @@ public class ListCourseRoom extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
-
-
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         int i=0;

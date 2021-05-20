@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,11 +63,16 @@ public class TeamView extends AppCompatActivity {
         maketeam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MakeTeam.class);
-                intent.putExtra("tpname",strText);
-                intent.putExtra("coursenum",courseNum);
-                setResult(RESULT_OK, intent);
-                startActivity(intent);
+
+                if(passedIntent.getStringExtra("status").equals("Professor")) {
+                    Intent intent = new Intent(getApplicationContext(), MakeTeam.class);
+                    intent.putExtra("tpname", strText);
+                    intent.putExtra("coursenum", courseNum);
+                    setResult(RESULT_OK, intent);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "학생은 팀 생성 권한이 없습니다" , Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

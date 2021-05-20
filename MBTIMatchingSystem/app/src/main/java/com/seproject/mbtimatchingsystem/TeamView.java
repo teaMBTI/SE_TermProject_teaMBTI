@@ -2,6 +2,7 @@ package com.seproject.mbtimatchingsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,6 +42,7 @@ public class TeamView extends AppCompatActivity {
             for(int i=0; i<teamlistBundle.size(); i++) {
                 String team = teamlistBundle.getString("Team " + i);
 
+                Log.d("print",team);
                 result = result.concat("Team " + i + ": \n" + team + "\n\n");
             }
 

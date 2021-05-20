@@ -95,7 +95,7 @@ public class MakeTeam extends AppCompatActivity {
                         String idtemp = readstr.substring(idx - 9, idx);
                         String mbtitemp = readstr.substring(idx+1, idx+5);
 
-                        mbti.add(idtemp + "(" + mbtitemp + ")");
+                        mbti.add(mbtitemp + "(" + idtemp + ")");
                         readstr = readstr.substring(idx+5);
 
                     }
@@ -247,7 +247,6 @@ public class MakeTeam extends AppCompatActivity {
                     }
                 }
 
-
                 Intent intent = new Intent(getApplicationContext(), TeamView.class);
                 Bundle teamlistBundle = new Bundle();
 
@@ -256,10 +255,11 @@ public class MakeTeam extends AppCompatActivity {
                     String temp ="";
                     for(int j=0; j<result[i].length; j++) {
                         if(result[i][j] != null) {
-                            temp.concat(result[i][j] + " ");
+                            temp = temp.concat(result[i][j] + " ");
                         }
                     }
 
+                    Log.d("test",temp);
                     if(result[i][0] != null)
                         teamlistBundle.putString("Team " + i, temp);
 

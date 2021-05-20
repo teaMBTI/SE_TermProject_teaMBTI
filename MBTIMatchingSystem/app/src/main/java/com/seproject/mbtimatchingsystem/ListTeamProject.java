@@ -58,7 +58,7 @@ public class ListTeamProject extends AppCompatActivity {
 
     List<Object> emailList = new ArrayList<Object>();
     private static final String TAG = "ListCourseRoom";
-    String topic;
+    String topic = "null";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

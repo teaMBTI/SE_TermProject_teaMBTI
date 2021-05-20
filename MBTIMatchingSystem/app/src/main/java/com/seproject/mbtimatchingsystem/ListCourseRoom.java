@@ -76,116 +76,15 @@ public class ListCourseRoom extends AppCompatActivity {
         }
 
 
-        //ListView에 목록 세팅
+        /* ListView에 목록 세팅 */
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
         adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 누르면
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this); //강좌 참여하시겠습니까 팝업
-                builder.setTitle("");
-                builder.setMessage("해당 강좌에 참여하시겠습니까?");
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener(){
-                            @Override
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                readEmailAndPutId(); //db st_participate_id에 입력
-                                String course = (String) listView.getItemAtPosition(position);
-                                startToast(course);
-
-                                if (course.contains("소프트웨어공학")) {
-                                    topic = "SE";
-                                } else if (course.contains("데이터과학")) {
-                                    topic = "DS";
-                                } else if (course.equals("모바일프로그래밍(10178001)")) {
-                                    topic = "MP1";
-                                } else if (course.equals("모바일프로그래밍(10178002)")) {
-                                    topic = "MP2";
-                                }
-                                nowCourseNum=cuttingCourseNum(course);
-                                if (topic.equals("SE")) {
-                                    FirebaseMessaging.getInstance().subscribeToTopic("SE")
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    String msg = "Subscribed to SE";
-                                                    if (!task.isSuccessful()) {
-                                                        msg = "Failed to subscribe to SE";
-                                                    }
-                                                    Log.d(TAG, msg);
-                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-                                if (topic.equals("DS")) {
-                                    FirebaseMessaging.getInstance().subscribeToTopic("DS")
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    String msg = "Subscribed to DS";
-                                                    if (!task.isSuccessful()) {
-                                                        msg = "Failed to subscribe to DS";
-                                                    }
-                                                    Log.d(TAG, msg);
-                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-                                if (topic.equals("MP1")) {
-                                    FirebaseMessaging.getInstance().subscribeToTopic("MP1")
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    String msg = "Subscribed to MP1";
-                                                    if (!task.isSuccessful()) {
-                                                        msg = "Failed to subscribe to MP1";
-                                                    }
-                                                    Log.d(TAG, msg);
-                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-                                if (topic.equals("MP2")) {
-                                    FirebaseMessaging.getInstance().subscribeToTopic("MP2")
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    String msg = "Subscribed to MP2";
-                                                    if (!task.isSuccessful()) {
-                                                        msg = "Failed to subscribe to MP2";
-                                                    }
-                                                    Log.d(TAG, msg);
-                                                    Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-
-                                Intent NewActivity = new Intent(getApplicationContext(),
-                                com.seproject.mbtimatchingsystem.ListTeamProject.class);
-                                NewActivity.putExtra("course", course);
-                                setResult(RESULT_OK, NewActivity);
-                                startActivity(NewActivity);
-                            }
-                        });
-                builder.setNegativeButton("아니오",new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                startToast("해당 강좌에 참여하지 않습니다.");
-                            }
-                        });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
-            }
-        });
 
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //리스트뷰(강좌목록)보여줌
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //강좌목록(리스트뷰)데이터 읽기
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adapter.clear();
@@ -204,6 +103,111 @@ public class ListCourseRoom extends AppCompatActivity {
             }
         });
 
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
+            @Override
+           public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String course = (String) listView.getItemAtPosition(position);
+                if(nowStatus.equals("Professor")){ // Professor은 팝업창이 안뜬다.
+                    goToListTeamProject(course);
+                }
+                else if(nowStatus.equals("Student")) { //Student 경우
+
+                    /*if( st_participate_id.equals("presence")){ //이미 강좌에 입장한 학생이라면 바로 입장
+                        goToListTeamProject(course);
+                    }
+                    else{ */          //처음 강좌에 입장하는 학생이면, 팝업
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this); //강좌 입장하시겠습니까 팝업
+                    builder.setTitle("");
+                    builder.setMessage("해당 강좌에 입장하시겠습니까?");
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            readEmailAndPutId(); //db st_participate_id에 입력
+                            String course = (String) listView.getItemAtPosition(position);
+                            if (course.contains("소프트웨어공학")) {
+                                topic = "SE";
+                            } else if (course.contains("데이터과학")) {
+                                topic = "DS";
+                            } else if (course.equals("모바일프로그래밍(10178001)")) {
+                                topic = "MP1";
+                            } else if (course.equals("모바일프로그래밍(10178002)")) {
+                                topic = "MP2";
+                            }
+                            nowCourseNum=cuttingCourseNum(course);
+                            if (topic.equals("SE")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("SE")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to SE";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to SE";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("DS")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("DS")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to DS";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to DS";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("MP1")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("MP1")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to MP1";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to MP1";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("MP2")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("MP2")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to MP2";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to MP2";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            goToListTeamProject(course);
+                        }
+                    });
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            startToast("해당 강좌에 입장하지 않습니다.");
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();}
+            }
+            /*  }*/
+        });
+
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         int i=0;
         for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
@@ -214,7 +218,7 @@ public class ListCourseRoom extends AppCompatActivity {
         }
         database= FirebaseDatabase.getInstance();
         ref=database.getReference("id_list");
-        ref.addValueEventListener(new ValueEventListener() {   //addCourse버튼 눌렀을시 유저의 status불러옴
+        ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -256,6 +260,18 @@ public class ListCourseRoom extends AppCompatActivity {
                 }
             });
     }
+
+    private void goToListTeamProject(String course) {
+        startToast(course);
+        nowCourseNum=cuttingCourseNum(course);
+        Intent NewActivity = new Intent(getApplicationContext(),
+                com.seproject.mbtimatchingsystem.ListTeamProject.class);
+        NewActivity.putExtra("course", course);
+        setResult(RESULT_OK, NewActivity);
+        startActivity(NewActivity);
+    }
+
+
     private void readEmailAndPutId() {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -290,7 +306,6 @@ public class ListCourseRoom extends AppCompatActivity {
                 DatabaseReference courseRef = database.getReference().child("course_list");
                 courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //st_participate_id에 학번,mbti 데이터쓰기
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }

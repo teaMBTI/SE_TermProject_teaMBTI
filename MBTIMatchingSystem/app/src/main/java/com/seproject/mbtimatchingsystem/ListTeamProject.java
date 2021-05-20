@@ -42,7 +42,6 @@ public class ListTeamProject extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
     private DatabaseReference ref;
     TextView courseName;
-    Button participate;
     String id_listEmail;
     String nowId;
     String nowEmail;
@@ -119,19 +118,6 @@ public class ListTeamProject extends AppCompatActivity {
         });
 
 
-
-        participate = findViewById(R.id.participate); //참가하기
-        participate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startToast("수업에 참가하셨습니다.");
-                readEmailAndPutId();
-
-
-            }
-        });
-
-
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView_tp);
 
         listView = (ListView) findViewById(R.id.listView_tp);
@@ -181,50 +167,6 @@ public class ListTeamProject extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 scrollView.requestDisallowInterceptTouchEvent(true);
                 return false;
-            }
-        });
-    }
-
-    private void readEmailAndPutId() {
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        int i = 0;
-        for (UserInfo profile : user.getProviderData()) {
-            // 현재 사용자 이메일 가져오기
-            String currentUserEmail = profile.getUid();
-            if (i == 1) {
-                nowEmail = currentUserEmail;
-            }
-            i++;
-        }
-        database = FirebaseDatabase.getInstance();
-        mPostReference = database.getReference("id_list");
-        mPostReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    id_listEmail = snapshot.getValue().toString();
-                    //Log.e("MMMYYTAGG", "listInfo: " +id_listEmail);
-
-                    nowId = id_listEmail;
-                    nowMbti = id_listEmail;
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
-
-                    if (nowEmail.equals(id_listEmail)) {
-                        nowId = cuttingId(nowId);
-                        nowMbti = cuttingMbti(nowMbti);
-
-                        // Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
-                        // Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);
-                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
-                    }
-                }
-                DatabaseReference courseRef = database.getReference().child("course_list");
-                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //학번,mbti 데이터쓰기
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
     }

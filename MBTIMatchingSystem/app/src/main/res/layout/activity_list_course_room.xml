@@ -4,22 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ListCourseRoom">
 
     <ImageView
         android:id="@+id/MBTI_TEAM"
-        android:src="@drawable/mbti_team"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/LoginIn"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="30dp"
+        android:src="@drawable/mbti_team" />
 
     <TextView
         android:id="@+id/courseRoom"
-        android:layout_below="@id/MBTI_TEAM"
         android:layout_width="192dp"
         android:layout_height="wrap_content"
+        android:layout_below="@id/MBTI_TEAM"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
@@ -43,13 +44,13 @@
 
     <ImageButton
         android:id="@+id/addCourseButton"
-        android:layout_width="66dp"
-        android:layout_height="85dp"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="300dp"
-        android:layout_marginEnd="45dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="14dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
         app:srcCompat="@drawable/plus" />
@@ -59,12 +60,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="#B1B1B1"
+        android:backgroundTint="@color/yellow"
         android:text="로그아웃"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="18sp"
         app:cornerRadius="30dp" />
 

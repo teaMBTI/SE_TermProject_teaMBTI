@@ -1,8 +1,10 @@
 package com.seproject.mbtimatchingsystem;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,8 +41,11 @@ public class ListCourseRoom extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     List<Object> courseList = new ArrayList<Object>();
     String nowEmail;
-    String id_listEmail;
+    String nowId;
+    String nowCourseNum;
+    String nowMbti;
     String nowStatus;
+    String id_listEmail;
     public Button logOutButton;
     ImageButton addCourseButton;
 
@@ -65,12 +70,6 @@ public class ListCourseRoom extends AppCompatActivity {
             }
         }
 
-        //참고자료 메모
-        //중요_레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
-        /*파이어베이스 데이터 받아서 리스트뷰연결
-        https://angkeum.tistory.com/entry/firebase-android-connect-%ED%8C%8C%EC%9D%B4%EC%96%B4%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EC%97%B0%EA%B2%B0
-        ****  https://steemit.com/kr-dev/@gbgg/firebase-3-firebase
-        */
 
         //ListView에 목록 세팅
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
@@ -82,16 +81,36 @@ public class ListCourseRoom extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String course = (String) listView.getItemAtPosition(position);
-                startToast(course);
-                Intent NewActivity = new Intent(getApplicationContext(),
-                        com.seproject.mbtimatchingsystem.ListTeamProject.class);
-                NewActivity.putExtra("course", course);
-                setResult(RESULT_OK, NewActivity);
-                startActivity(NewActivity);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this); //강좌 참여하시겠습니까 팝업
+                builder.setTitle("");
+                builder.setMessage("해당 강좌에 참여하시겠습니까?");
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int id)
+                            {
+                                readEmailAndPutId(); //db st_participate_id에 입력
+                                String course = (String) listView.getItemAtPosition(position);
+                                startToast(course);
+                                nowCourseNum=cuttingCourseNum(course);
+                                Intent NewActivity = new Intent(getApplicationContext(),
+                                com.seproject.mbtimatchingsystem.ListTeamProject.class);
+                                NewActivity.putExtra("course", course);
+                                setResult(RESULT_OK, NewActivity);
+                                startActivity(NewActivity);
+                            }
+                        });
+                builder.setNegativeButton("아니오",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                startToast("해당 강좌에 참여하지 않습니다.");
+                            }
+                        });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
             }
         });
-
 
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
@@ -100,10 +119,10 @@ public class ListCourseRoom extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adapter.clear();
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
-                   String course_list = messageData.getValue().toString();
-                   course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
-                   courseList.add(course_list);
-                   adapter.add(course_list);
+                    String course_list = messageData.getValue().toString();
+                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
+                    courseList.add(course_list);
+                    adapter.add(course_list);
                 }
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);
@@ -112,6 +131,8 @@ public class ListCourseRoom extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+
+
 
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -166,7 +187,46 @@ public class ListCourseRoom extends AppCompatActivity {
                 }
             });
     }
+    private void readEmailAndPutId() {
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        int i = 0;
+        for (UserInfo profile : user.getProviderData()) {
+            // 현재 사용자 이메일 가져오기
+            String currentUserEmail = profile.getUid();
+            if (i == 1) {
+                nowEmail = currentUserEmail;
+            }
+            i++;
+        }
+        database = FirebaseDatabase.getInstance();
+        mPostReference = database.getReference("id_list");
+        mPostReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    id_listEmail = snapshot.getValue().toString();
+                    nowId = id_listEmail;
+                    nowMbti = id_listEmail;
+                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+
+                    if (nowEmail.equals(id_listEmail)) {
+                        nowId = cuttingId(nowId);
+                        nowMbti = cuttingMbti(nowMbti);
+/*                         Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
+                         Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);*/
+                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시, nowId에 학번넣고 break;
+                    }
+                }
+                DatabaseReference courseRef = database.getReference().child("course_list");
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //st_participate_id에 학번,mbti 데이터쓰기
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
 
 
     @Override
@@ -196,6 +256,20 @@ public class ListCourseRoom extends AppCompatActivity {
     }
     private String cuttingEmail(String msg) {//이메일만 자르기
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
+        return msg;
+    }
+
+    private String cuttingId(String msg) {//학번만 자르기
+        msg = msg.substring(msg.indexOf(", id=") + 5, msg.indexOf(", email"));
+        return msg;
+    }
+
+    private String cuttingMbti(String msg) { //MBTI만 자르기
+        msg = msg.substring(msg.indexOf(", mbti=") + 7, msg.indexOf(", id"));
+        return msg;
+    }
+    private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
+        msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
 

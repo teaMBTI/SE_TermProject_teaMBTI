@@ -124,9 +124,9 @@ public class ListTeamProject extends AppCompatActivity {
             topic = "SE";
         } else if (course.contains("데이터과학")) {
             topic = "DS";
-        } else if (course.equals("모바일 프로그래밍(10178001)")) {
+        } else if (course.equals("모바일프로그래밍(10178001)")) {
             topic = "MP1";
-        } else if (course.equals("모바일 프로그래밍(10178002)")) {
+        } else if (course.equals("모바일프로그래밍(10178002)")) {
             topic = "MP2";
         }
 

@@ -21,12 +21,24 @@
         android:enabled="false" />
 
     <EditText
-        android:id="@+id/teamlist"
+        android:id="@+id/teammake"
         android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="아직 팀이 생성되지 않았습니다"
-        android:scrollbars="vertical"
         android:enabled="false" />
+
+    <ListView
+        android:id="@+id/teamlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/teamview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:enabled="false"
+        />
 
 </LinearLayout>

@@ -55,7 +55,7 @@ public class MakeTeam extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     Button btn;
-    String strText;
+    String TPName;
     String readstr = "";
 
     @Override
@@ -67,8 +67,8 @@ public class MakeTeam extends AppCompatActivity {
 
         TextView project_name = (TextView) findViewById(R.id.tpname);
 
-        strText = passedIntent.getStringExtra("tpname");
-        project_name.setText(strText);
+        TPName = passedIntent.getStringExtra("tpname");
+        project_name.setText(TPName);
 
         courseNum = passedIntent.getStringExtra("coursenum");
 
@@ -248,25 +248,24 @@ public class MakeTeam extends AppCompatActivity {
                 }
 
                 Intent intent = new Intent(getApplicationContext(), TeamView.class);
-                Bundle teamlistBundle = new Bundle();
-
+                HashMap<String, String> res = new HashMap<>();
 
                 for(int i=0; i<result.length; i++){
                     String temp ="";
                     for(int j=0; j<result[i].length; j++) {
                         if(result[i][j] != null) {
-                            temp = temp.concat(result[i][j] + " ");
+                            temp = temp.concat(result[i][j].substring(5,14) + " ");
                         }
                     }
 
-                    Log.d("test",temp);
-                    if(result[i][0] != null)
-                        teamlistBundle.putString("Team " + i, temp);
+                    if(result[i][0] != null){
+                        res.put("Team " + i, temp);
+                    }
 
                 }
 
-                intent.putExtra("BUNDLE", teamlistBundle);
-                setResult(RESULT_OK,intent);
+                mDatabase.child("course_list").child(courseNum).child("teaminfo").child(TPName).setValue(res);
+
                 startActivity(intent);
 
             }

@@ -1,8 +1,10 @@
 package com.seproject.mbtimatchingsystem;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -23,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +44,15 @@ public class ListCourseRoom extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     List<Object> courseList = new ArrayList<Object>();
     String nowEmail;
-    String id_listEmail;
+    String nowId;
+    String nowCourseNum;
+    String nowMbti;
     String nowStatus;
+    String id_listEmail;
     public Button logOutButton;
     ImageButton addCourseButton;
+    private static final String TAG = "ListCourseRoom";
+    String topic = "null";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,45 +75,25 @@ public class ListCourseRoom extends AppCompatActivity {
             }
         }
 
-        //참고자료 메모
-        //중요_레이아웃 동적생성(courseroom들갈때 써야함) https://blog.naver.com/rain483/220812579755
-        /*파이어베이스 데이터 받아서 리스트뷰연결
-        https://angkeum.tistory.com/entry/firebase-android-connect-%ED%8C%8C%EC%9D%B4%EC%96%B4%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EC%97%B0%EA%B2%B0
-        ****  https://steemit.com/kr-dev/@gbgg/firebase-3-firebase
-        */
 
-        //ListView에 목록 세팅
+        /* ListView에 목록 세팅 */
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
         adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         listView.setAdapter(adapter);
 
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 누르면
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String course = (String) listView.getItemAtPosition(position);
-                startToast(course);
-                Intent NewActivity = new Intent(getApplicationContext(),
-                        com.seproject.mbtimatchingsystem.ListTeamProject.class);
-                NewActivity.putExtra("course", course);
-                setResult(RESULT_OK, NewActivity);
-                startActivity(NewActivity);
-            }
-        });
-
-
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //리스트뷰(강좌목록)보여줌
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //강좌목록(리스트뷰)데이터 읽기
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adapter.clear();
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
-                   String course_list = messageData.getValue().toString();
-                   course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
-                   courseList.add(course_list);
-                   adapter.add(course_list);
+                    String course_list = messageData.getValue().toString();
+                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
+                    courseList.add(course_list);
+                    adapter.add(course_list);
+
                 }
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);
@@ -111,6 +101,110 @@ public class ListCourseRoom extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
+        });
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
+            @Override
+           public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String course = (String) listView.getItemAtPosition(position);
+                if(nowStatus.equals("Professor")){ // Professor은 팝업창이 안뜬다.
+                    goToListTeamProject(course);
+                }
+                else if(nowStatus.equals("Student")) { //Student 경우
+
+                    /*if( st_participate_id.equals("presence")){ //이미 강좌에 입장한 학생이라면 바로 입장
+                        goToListTeamProject(course);
+                    }
+                    else{ */          //처음 강좌에 입장하는 학생이면, 팝업
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this); //강좌 입장하시겠습니까 팝업
+                    builder.setTitle("");
+                    builder.setMessage("해당 강좌에 입장하시겠습니까?");
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            readEmailAndPutId(); //db st_participate_id에 입력
+                            String course = (String) listView.getItemAtPosition(position);
+                            if (course.contains("소프트웨어공학")) {
+                                topic = "SE";
+                            } else if (course.contains("데이터과학")) {
+                                topic = "DS";
+                            } else if (course.equals("모바일프로그래밍(10178001)")) {
+                                topic = "MP1";
+                            } else if (course.equals("모바일프로그래밍(10178002)")) {
+                                topic = "MP2";
+                            }
+                            nowCourseNum=cuttingCourseNum(course);
+                            if (topic.equals("SE")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("SE")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to SE";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to SE";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("DS")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("DS")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to DS";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to DS";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("MP1")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("MP1")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to MP1";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to MP1";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            if (topic.equals("MP2")) {
+                                FirebaseMessaging.getInstance().subscribeToTopic("MP2")
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subscribed to MP2";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Failed to subscribe to MP2";
+                                                }
+                                                Log.d(TAG, msg);
+                                                Toast.makeText(ListCourseRoom.this, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                            goToListTeamProject(course);
+                        }
+                    });
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            startToast("해당 강좌에 입장하지 않습니다.");
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();}
+            }
+            /*  }*/
         });
 
 
@@ -124,7 +218,7 @@ public class ListCourseRoom extends AppCompatActivity {
         }
         database= FirebaseDatabase.getInstance();
         ref=database.getReference("id_list");
-        ref.addValueEventListener(new ValueEventListener() {   //addCourse버튼 눌렀을시 유저의 status불러옴
+        ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -167,6 +261,56 @@ public class ListCourseRoom extends AppCompatActivity {
             });
     }
 
+    private void goToListTeamProject(String course) {
+        startToast(course);
+        nowCourseNum=cuttingCourseNum(course);
+        Intent NewActivity = new Intent(getApplicationContext(),
+                com.seproject.mbtimatchingsystem.ListTeamProject.class);
+        NewActivity.putExtra("course", course);
+        setResult(RESULT_OK, NewActivity);
+        startActivity(NewActivity);
+    }
+
+
+    private void readEmailAndPutId() {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        int i = 0;
+        for (UserInfo profile : user.getProviderData()) {
+            // 현재 사용자 이메일 가져오기
+            String currentUserEmail = profile.getUid();
+            if (i == 1) {
+                nowEmail = currentUserEmail;
+            }
+            i++;
+        }
+        database = FirebaseDatabase.getInstance();
+        mPostReference = database.getReference("id_list");
+        mPostReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    id_listEmail = snapshot.getValue().toString();
+                    nowId = id_listEmail;
+                    nowMbti = id_listEmail;
+                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+
+                    if (nowEmail.equals(id_listEmail)) {
+                        nowId = cuttingId(nowId);
+                        nowMbti = cuttingMbti(nowMbti);
+/*                         Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
+                         Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);*/
+                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시, nowId에 학번넣고 break;
+                    }
+                }
+                DatabaseReference courseRef = database.getReference().child("course_list");
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //st_participate_id에 학번,mbti 데이터쓰기
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
 
 
     @Override
@@ -196,6 +340,20 @@ public class ListCourseRoom extends AppCompatActivity {
     }
     private String cuttingEmail(String msg) {//이메일만 자르기
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
+        return msg;
+    }
+
+    private String cuttingId(String msg) {//학번만 자르기
+        msg = msg.substring(msg.indexOf(", id=") + 5, msg.indexOf(", email"));
+        return msg;
+    }
+
+    private String cuttingMbti(String msg) { //MBTI만 자르기
+        msg = msg.substring(msg.indexOf(", mbti=") + 7, msg.indexOf(", id"));
+        return msg;
+    }
+    private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
+        msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
 

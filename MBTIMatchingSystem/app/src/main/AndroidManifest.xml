@@ -11,10 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MBTIMatchingSystem">
+
         <activity android:name=".WriteSInformation" />
         <activity android:name=".WritePInformation" />
         <activity android:name=".AddCourse" />
         <activity android:name=".ListCourseRoom">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +26,7 @@
         <activity android:name=".JoinActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".ListTeamProject"/>
+        <activity android:name=".ListTeamProject" />
         <activity android:name=".AddTeamProject" />
         <activity android:name=".MakeTeam"/>
         <activity android:name=".TeamView"/>

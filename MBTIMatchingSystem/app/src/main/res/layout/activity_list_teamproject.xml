@@ -19,7 +19,7 @@
     <ScrollView
         android:id="@+id/scrollView_tp"
         android:layout_width="match_parent"
-        android:layout_height="460dp"
+        android:layout_height="450dp"
         android:layout_marginTop="20dp"
         android:fillViewport="true">
 
@@ -31,16 +31,15 @@
 
     <ImageButton
         android:id="@+id/addTeamProject"
-        android:layout_width="75dp"
-        android:layout_height="97dp"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="80dp"
         android:layout_gravity="right"
-        android:layout_marginRight="15dp"
-        android:adjustViewBounds="true"
+        android:layout_marginRight="25dp"
         android:onClick="onClick"
-        android:scaleType="fitCenter"
-        android:src="@drawable/plus"
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/plus"
 
-        app:backgroundTint="@color/white"
-        tools:ignore="MissingConstraints" />
+        android:background="@android:color/transparent" />
 
 </LinearLayout>

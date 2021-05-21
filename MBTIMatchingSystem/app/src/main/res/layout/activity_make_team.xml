@@ -21,18 +21,47 @@
         android:text="Team project Name"
         android:gravity="center_horizontal"
         android:layout_marginTop="20dp"/>
-    <EditText
-        android:id="@+id/wholemember"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="총 학생수: "
-        android:layout_marginTop="30dp"/>
+        android:orientation="horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="left"
+        android:text=" 총 학생수: "
+        android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/wholemember"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="30dp"
+            android:hint="60" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="left"
+        android:text=" 최소 팀원수: "
+        android:textSize="20dp" />
     <EditText
         android:id="@+id/minmember"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="최소 팀원 수: "
+        android:hint="5 "
         android:layout_marginTop="20dp"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/createTeam"

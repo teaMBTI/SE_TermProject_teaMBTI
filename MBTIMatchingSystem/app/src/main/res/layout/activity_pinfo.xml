@@ -22,7 +22,6 @@
         android:layout_marginTop="30dp"
         android:gravity="center|top"
         android:text="교수 정보 입력"
-        android:textColor="#090909"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -94,7 +93,6 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#3DC68F"
         android:text="정보 저장"
-        android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:cornerRadius="30dp" />
 

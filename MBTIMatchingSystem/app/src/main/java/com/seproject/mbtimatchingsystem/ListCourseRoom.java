@@ -29,7 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ListCourseRoom extends AppCompatActivity {
@@ -312,7 +314,6 @@ public class ListCourseRoom extends AppCompatActivity {
         });
     }
 
-
     @Override
     //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
     public void onStart() {
@@ -356,6 +357,48 @@ public class ListCourseRoom extends AppCompatActivity {
         msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
+
+
+    public String getStatus(String email) {
+      String testStudentData=" email:harry@google.com, status:Student, email:mj@gmail.com, status:Student, email:bere@google.com, status:Student ...";
+      String testSProfessorData="email:Wonkimtx@naver.com , status:Professor, email:kimy17@google.com, status:Professor ...";
+      if(testStudentData.contains(email))
+      return "Student";
+      else if(testSProfessorData.contains(email))
+          return "Professor";
+      else
+          return"Null"; //데이터에 없는 이메일인 경우
+    }
+    public String enterCourse(String courseNum) {
+        String enterCourseData= "소프트웨어공학";
+        String courseListData="소프트웨어공학(10177002), 데이터과학(10177003), 모바일프로그래밍(10178001), 모바일프로그래밍(10178002)";
+        String temp = courseListData;
+        if(courseListData.contains(courseNum)) {
+            temp = temp.substring(0, courseListData.indexOf(courseNum)-1);
+            enterCourseData = temp;
+        }
+        /*ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String course = (String) listView.getItemAtPosition(position);
+                course = "소프트웨어공학";
+                enterNowCourse[0] =course;
+            }
+         });*/
+        return enterCourseData;
+    }
+    public String getAddCourseInfo(String courseNum, String courseName, String pf_id, String pf_name) {
+        String[] testCourseInfo = new String[]{courseNum,courseName,pf_id,pf_name};
+        String[] getCourseInfo = new String[]{"10177002", "소프트웨어공학", "20090000", "정옥란"};
+        if(Arrays.equals(testCourseInfo, getCourseInfo))
+            return "Yes";
+
+            return "NO";
+    }
+
+
+
 
 
 }

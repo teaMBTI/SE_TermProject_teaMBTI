@@ -101,11 +101,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        startJoinActivity(); //뒤로가기 누르면 회원가입 화면으로
-//    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1); //메인에서 로그아웃 하고 뒤로가기했는데 또 메인 뜨는 일 없게 강제종료
+    }
 
     private void startListCourseRoomActivity()
     {

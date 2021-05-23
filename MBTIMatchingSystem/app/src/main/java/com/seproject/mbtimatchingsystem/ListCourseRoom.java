@@ -55,6 +55,7 @@ public class ListCourseRoom extends AppCompatActivity {
     ImageButton addCourseButton;
     private static final String TAG = "ListCourseRoom";
     String topic = "null";
+    private long backBtnTime = 0; // 뒤로가기 버튼 누를 때 필요
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,7 @@ public class ListCourseRoom extends AppCompatActivity {
 
         if (mFirebaseUser == null) //현재 로그인된 유저가 있는지 확인
         {
-            startLoginActivity(); //로그인이 안되어 있으면 회원가입 화면으로 이동
+            startLoginActivity(); //로그인이 안되어 있으면 로그인     화면으로 이동
         }else { //현재 로그인 되어 있다면
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
@@ -397,8 +398,20 @@ public class ListCourseRoom extends AppCompatActivity {
             return "NO";
     }
 
+    @Override
+    public void onBackPressed() {
+        long curTime = System.currentTimeMillis();
+        long gapTime = curTime - backBtnTime;
 
+        if(0 <= gapTime && 2000 >= gapTime) {
+            super.onBackPressed();
+        }
+        else {
+            backBtnTime = curTime;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
+        }
 
+    }
 
 
 }

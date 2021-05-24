@@ -113,139 +113,7 @@ public class MakeTeam extends AppCompatActivity {
                 int wholemember = Integer.parseInt(whole.getText().toString());
                 minmember = Integer.parseInt(min.getText().toString());
 
-                /*
-                 * 1. NP/NJ/SP/SJ 별로 인원 분류 후 팀 매칭
-                 * 처음에 모든 인원을 담아놓은 MBTI에서 멤버별로 분류하는 부분
-                 */
-                while(mbti.size() != 0) {
-                    String temp = mbti.get(0);
-
-                    if(temp.substring(3,4).equals("P")) {
-                        if(temp.substring(1,2).equals("N"))
-                            NP.add(temp);
-                        else
-                            SP.add(temp);
-                    }
-                    else {
-                        if(temp.substring(1,2).equals("N"))
-                            NJ.add(temp);
-                        else
-                            SJ.add(temp);
-                    }
-
-                    mbti.remove(0);
-                }
-
-
-                /*
-                 * NP/NJ/SP/SJ 순으로 팀을 result array로 옮기는 과정.
-                 * 각 ArrayList 별로 4번 반복
-                 * 메커니즘 >
-                 * 1. NP ArryayList에 담겨있는 멤버수 체크
-                 * 2. ArrayList에 담겨있는 멤버수가 minmembers 이상 있는 경우, 앞에서부터 순서대로 minmembers의 수 만큼 뽑아 팀 매칭
-                 * 3. 이 과정을 반복하다가, ArrayList 안에 minmembers 보다 적게 남은 경우, 남아있는 멤버들을 J or P 에 맞는 ArrayList에 넣는다
-                 */
-                int idx=0;
-
-                while(NP.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        int rand = (int) (Math.random() * NP.size());
-                        result[idx][i] = NP.get(rand);
-                        NP.remove(rand);
-                    }
-                    idx++;
-                    if(0 < NP.size() && NP.size() < minmember) {
-                        while(NP.size() != 0) {
-                            P.add(NP.get(0));
-                            NP.remove(0);
-                        }
-                    }
-                }
-
-                while(NJ.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        result[idx][i] = NJ.get(0);
-                        NJ.remove(0);
-                    }
-                    idx++;
-                    if(0 < NJ.size() && NJ.size() < minmember) {
-                        while(NJ.size() != 0) {
-                            J.add(NJ.get(0));
-                            NJ.remove(0);
-                        }
-                    }
-                }
-
-                while(SP.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        result[idx][i] = SP.get(0);
-                        SP.remove(0);
-                    }
-                    idx++;
-                    if(0 < SP.size() && SP.size() < minmember) {
-                        while(SP.size() != 0) {
-                            P.add(SP.get(0));
-                            SP.remove(0);
-                        }
-                    }
-                }
-
-                while(SJ.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        result[idx][i] = SJ.get(0);
-                        SJ.remove(0);
-                    }
-                    idx++;
-                    if(0 < SJ.size() && SJ.size() < minmember) {
-                        while(SJ.size() != 0) {
-                            J.add(SJ.get(0));
-                            SJ.remove(0);
-                        }
-                    }
-                }
-
-                // P 재분류
-                while(P.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        result[idx][i] = P.get(0);
-                        P.remove(0);
-                    }
-                    idx++;
-                    if(0 < P.size() && P.size() < minmember) {
-                        int tempidx=0;
-                        int added=0;
-                        while(P.size() != 0) {
-                            if(result[tempidx%idx][0].substring(3,4).equals("P")) {
-                                result[tempidx%idx][minmember+added] = P.get(0);
-                                P.remove(0);
-                            } else {
-                                tempidx++;
-                            }
-                        }
-                    }
-                }
-
-
-                // J 재분류
-                while(J.size() >= minmember) {
-                    for(int i=0; i<minmember; i++) {
-                        result[idx][i] = J.get(0);
-                        J.remove(0);
-                    }
-                    idx++;
-                    if(0 < J.size() && J.size() < minmember) {
-                        int tempidx=0;
-                        int added=0;
-                        while(J.size() != 0) {
-                            if(result[tempidx%idx][0].substring(3,4).equals("J")) {
-                                result[tempidx%idx][minmember+added] = J.get(0);
-                                J.remove(0);
-                            } else {
-                                tempidx++;
-                            }
-                        }
-                    }
-                }
+                team_matching();
 
                 Intent intent = new Intent(getApplicationContext(), TeamView.class);
                 HashMap<String, String> res = new HashMap<>();
@@ -271,7 +139,161 @@ public class MakeTeam extends AppCompatActivity {
             }
         });
 
-
-
     }
+
+    public void team_matching(){
+        /*
+         * 1. NP/NJ/SP/SJ 별로 인원 분류 후 팀 매칭
+         * 처음에 모든 인원을 담아놓은 MBTI에서 멤버별로 분류하는 부분
+         */
+        while(mbti.size() != 0) {
+            String temp = mbti.get(0);
+
+            if(temp.substring(3,4).equals("P")) {
+                if(temp.substring(1,2).equals("N"))
+                    NP.add(temp);
+                else
+                    SP.add(temp);
+            }
+            else {
+                if(temp.substring(1,2).equals("N"))
+                    NJ.add(temp);
+                else
+                    SJ.add(temp);
+            }
+
+            mbti.remove(0);
+        }
+
+
+        /*
+         * NP/NJ/SP/SJ 순으로 팀을 result array로 옮기는 과정.
+         * 각 ArrayList 별로 4번 반복
+         * 메커니즘 >
+         * 1. NP ArryayList에 담겨있는 멤버수 체크
+         * 2. ArrayList에 담겨있는 멤버수가 minmembers 이상 있는 경우, 앞에서부터 순서대로 minmembers의 수 만큼 뽑아 팀 매칭
+         * 3. 이 과정을 반복하다가, ArrayList 안에 minmembers 보다 적게 남은 경우, 남아있는 멤버들을 J or P 에 맞는 ArrayList에 넣는다
+         */
+        int idx=0;
+
+        while(NP.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                int rand = (int) (Math.random() * NP.size());
+                result[idx][i] = NP.get(rand);
+                NP.remove(rand);
+            }
+            idx++;
+            if(0 < NP.size() && NP.size() < minmember) {
+                while(NP.size() != 0) {
+                    P.add(NP.get(0));
+                    NP.remove(0);
+                }
+            }
+        }
+
+        while(NJ.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                result[idx][i] = NJ.get(0);
+                NJ.remove(0);
+            }
+            idx++;
+            if(0 < NJ.size() && NJ.size() < minmember) {
+                while(NJ.size() != 0) {
+                    J.add(NJ.get(0));
+                    NJ.remove(0);
+                }
+            }
+        }
+
+        while(SP.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                result[idx][i] = SP.get(0);
+                SP.remove(0);
+            }
+            idx++;
+            if(0 < SP.size() && SP.size() < minmember) {
+                while(SP.size() != 0) {
+                    P.add(SP.get(0));
+                    SP.remove(0);
+                }
+            }
+        }
+
+        while(SJ.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                result[idx][i] = SJ.get(0);
+                SJ.remove(0);
+            }
+            idx++;
+            if(0 < SJ.size() && SJ.size() < minmember) {
+                while(SJ.size() != 0) {
+                    J.add(SJ.get(0));
+                    SJ.remove(0);
+                }
+            }
+        }
+
+        // P 재분류
+        while(P.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                result[idx][i] = P.get(0);
+                P.remove(0);
+            }
+            idx++;
+            if(0 < P.size() && P.size() < minmember) {
+                int tempidx=0;
+                int added=0;
+                while(P.size() != 0) {
+                    if(result[tempidx%idx][0].substring(3,4).equals("P")) {
+                        result[tempidx%idx][minmember+added] = P.get(0);
+                        P.remove(0);
+                    } else {
+                        tempidx++;
+                    }
+                }
+            }
+        }
+
+
+        // J 재분류
+        while(J.size() >= minmember) {
+            for(int i=0; i<minmember; i++) {
+                result[idx][i] = J.get(0);
+                J.remove(0);
+            }
+            idx++;
+            if(0 < J.size() && J.size() < minmember) {
+                int tempidx=0;
+                int added=0;
+                while(J.size() != 0) {
+                    if(result[tempidx%idx][0].substring(3,4).equals("J")) {
+                        result[tempidx%idx][minmember+added] = J.get(0);
+                        J.remove(0);
+                    } else {
+                        tempidx++;
+                    }
+                }
+            }
+        }
+    }
+
+    public String createTeamTest() {
+
+        int minmember=2;
+
+        mbti.add("ENTJ");
+        mbti.add("ESTJ");
+        mbti.add("ENTP");
+        mbti.add("ESTP");
+        mbti.add("INFJ");
+        mbti.add("ISTJ");
+        mbti.add("INFP");
+        mbti.add("ISFP");
+
+        team_matching();
+
+        if(result[0][0] != null) return "Success";
+        else return "Fail";
+    }
+
 }

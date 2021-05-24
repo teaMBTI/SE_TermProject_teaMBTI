@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class ListTeamProject extends AppCompatActivity {
     ListView listView;
     ArrayAdapter<String> adapter;
     List<Object> tpList = new ArrayList<Object>();
+    List<Object> testList = new ArrayList<Object>();
 
     List<Object> emailList = new ArrayList<Object>();
 
@@ -126,7 +128,6 @@ public class ListTeamProject extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //팀프로젝트 리스트뷰 아이템 클릭시
                 String strText = (String) listView.getItemAtPosition(position);
-
                 Intent intent = new Intent(getApplicationContext(), TeamView.class); //TeamView 화면으로 이동
                 intent.putExtra("tpname", strText);
                 intent.putExtra("coursenum", nowCourseNum);
@@ -136,7 +137,6 @@ public class ListTeamProject extends AppCompatActivity {
 
             }
         });
-
 
         database = FirebaseDatabase.getInstance();
         mPostReference = database.getReference("course_list/" + nowCourseNum + "/teamprojectlist");
@@ -148,6 +148,8 @@ public class ListTeamProject extends AppCompatActivity {
                     String tp_list = messageData.getValue().toString(); //getValue()하면 TPName, teamNum, totalStuNum 모두 가져옴
                     tp_list = cuttingTPName(tp_list); //문자열에서 TPName만 잘라 얻어오는 함수
                     tpList.add(tp_list); //list array에 추가
+                    //Log.e("MMMYYTAGG", "tpList " +tp_list);
+                    //Log.e("MMMYYTAGG", "tpList " +tpList);  //이 함수를 벗어나면 null이 됨
                     adapter.add(tp_list);
                 }
                 adapter.notifyDataSetChanged();
@@ -194,4 +196,23 @@ public class ListTeamProject extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    public String isContained(String tpName) {
+        String TP = tpName;
+        testList.add("Architectural design");
+        testList.add("Design & Implementation");
+        testList.add("System modeling");
+        testList.add("Data cleaning");
+        testList.add("Data encoding");
+        testList.add("Proposal");
+        testList.add("Assignment1");
+        testList.add("Assignment2");
+
+        if(testList.contains(TP))
+        {
+            return "Yes";
+        }
+        else{
+            return "No";
+        }
+    }
 }

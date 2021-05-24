@@ -70,6 +70,33 @@ public class ListCourseRoom extends AppCompatActivity {
             startLoginActivity(); //로그인이 안되어 있으면 로그인     화면으로 이동
         }else { //현재 로그인 되어 있다면
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            int i=0;
+            for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
+                String currentUserEmail = profile.getUid();
+                if(i==1)
+                    nowEmail=currentUserEmail;
+                i++;
+            }
+            database= FirebaseDatabase.getInstance();
+            ref=database.getReference("id_list");
+            ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        id_listEmail = snapshot.getValue().toString();
+                        nowStatus =id_listEmail;
+                        id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                        if(nowEmail.equals(id_listEmail)) {
+                            nowStatus =cuttingStatus(nowStatus);
+                            Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
+                            break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
             if (user != null) {
                 for (UserInfo profile : user.getProviderData()) {
                     // 사용자 닉네임 가져오기
@@ -211,33 +238,7 @@ public class ListCourseRoom extends AppCompatActivity {
         });
 
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        int i=0;
-        for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
-            String currentUserEmail = profile.getUid();
-            if(i==1)
-                nowEmail=currentUserEmail;
-            i++;
-        }
-        database= FirebaseDatabase.getInstance();
-        ref=database.getReference("id_list");
-        ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    id_listEmail = snapshot.getValue().toString();
-                    nowStatus =id_listEmail;
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
-                    if(nowEmail.equals(id_listEmail)) {
-                        nowStatus =cuttingStatus(nowStatus);
-                        Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
-                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
+
 
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {

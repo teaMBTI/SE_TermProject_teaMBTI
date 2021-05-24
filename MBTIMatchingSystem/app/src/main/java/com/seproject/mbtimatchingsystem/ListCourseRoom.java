@@ -29,7 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ListCourseRoom extends AppCompatActivity {
@@ -53,6 +55,7 @@ public class ListCourseRoom extends AppCompatActivity {
     ImageButton addCourseButton;
     private static final String TAG = "ListCourseRoom";
     String topic = "null";
+    private long backBtnTime = 0; // 뒤로가기 버튼 누를 때 필요
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +67,36 @@ public class ListCourseRoom extends AppCompatActivity {
 
         if (mFirebaseUser == null) //현재 로그인된 유저가 있는지 확인
         {
-            startLoginActivity(); //로그인이 안되어 있으면 회원가입 화면으로 이동
+            startLoginActivity(); //로그인이 안되어 있으면 로그인     화면으로 이동
         }else { //현재 로그인 되어 있다면
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            int i=0;
+            for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
+                String currentUserEmail = profile.getUid();
+                if(i==1)
+                    nowEmail=currentUserEmail;
+                i++;
+            }
+            database= FirebaseDatabase.getInstance();
+            ref=database.getReference("id_list");
+            ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        id_listEmail = snapshot.getValue().toString();
+                        nowStatus =id_listEmail;
+                        id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                        if(nowEmail.equals(id_listEmail)) {
+                            nowStatus =cuttingStatus(nowStatus);
+                            Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
+                            break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
             if (user != null) {
                 for (UserInfo profile : user.getProviderData()) {
                     // 사용자 닉네임 가져오기
@@ -208,33 +238,7 @@ public class ListCourseRoom extends AppCompatActivity {
         });
 
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        int i=0;
-        for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
-            String currentUserEmail = profile.getUid();
-            if(i==1)
-                nowEmail=currentUserEmail;
-            i++;
-        }
-        database= FirebaseDatabase.getInstance();
-        ref=database.getReference("id_list");
-        ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    id_listEmail = snapshot.getValue().toString();
-                    nowStatus =id_listEmail;
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
-                    if(nowEmail.equals(id_listEmail)) {
-                        nowStatus =cuttingStatus(nowStatus);
-                        Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
-                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
+
 
         logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
         logOutButton.setOnClickListener(new View.OnClickListener() {
@@ -312,7 +316,6 @@ public class ListCourseRoom extends AppCompatActivity {
         });
     }
 
-
     @Override
     //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
     public void onStart() {
@@ -355,6 +358,60 @@ public class ListCourseRoom extends AppCompatActivity {
     private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
         msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
+    }
+
+
+    public String getStatus(String email) {
+      String testStudentData=" email:harry@google.com, status:Student, email:mj@gmail.com, status:Student, email:bere@google.com, status:Student ...";
+      String testSProfessorData="email:Wonkimtx@naver.com , status:Professor, email:kimy17@google.com, status:Professor ...";
+      if(testStudentData.contains(email))
+      return "Student";
+      else if(testSProfessorData.contains(email))
+          return "Professor";
+      else
+          return"Null"; //데이터에 없는 이메일인 경우
+    }
+    public String enterCourse(String courseNum) {
+        String enterCourseData= "소프트웨어공학";
+        String courseListData="소프트웨어공학(10177002), 데이터과학(10177003), 모바일프로그래밍(10178001), 모바일프로그래밍(10178002)";
+        String temp = courseListData;
+        if(courseListData.contains(courseNum)) {
+            temp = temp.substring(0, courseListData.indexOf(courseNum)-1);
+            enterCourseData = temp;
+        }
+        /*ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String course = (String) listView.getItemAtPosition(position);
+                course = "소프트웨어공학";
+                enterNowCourse[0] =course;
+            }
+         });*/
+        return enterCourseData;
+    }
+    public String getAddCourseInfo(String courseNum, String courseName, String pf_id, String pf_name) {
+        String[] testCourseInfo = new String[]{courseNum,courseName,pf_id,pf_name};
+        String[] getCourseInfo = new String[]{"10177002", "소프트웨어공학", "20090000", "정옥란"};
+        if(Arrays.equals(testCourseInfo, getCourseInfo))
+            return "Yes";
+
+            return "NO";
+    }
+
+    @Override
+    public void onBackPressed() {
+        long curTime = System.currentTimeMillis();
+        long gapTime = curTime - backBtnTime;
+
+        if(0 <= gapTime && 2000 >= gapTime) {
+            super.onBackPressed();
+        }
+        else {
+            backBtnTime = curTime;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 

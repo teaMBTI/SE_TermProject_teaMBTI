@@ -46,13 +46,29 @@ public class TeamView extends AppCompatActivity {
         Button maketeam = (Button) findViewById(R.id.maketeam);
         EditText team_view = (EditText) findViewById(R.id.teamview);
 
+        /*
+        Teamview xml can be accessed with two ways
+            1. from maketeam
+            2. from listcourseroom
+         */
+
+        // get the intent
         Intent passedIntent = getIntent();
 
         TPName = passedIntent.getStringExtra("tpname");
         courseNum = passedIntent.getStringExtra("coursenum");
 
+        // set the value from the intent
         project_name.setText(TPName);
 
+        /*
+            get the team information to show
+            change the default text "Team matching is completed"
+            if the team exists, make the listview for team information
+
+            if the team is selected, show the students' info in the team
+            in this process, use the students' list of the firebase
+         */
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("course_list").child(courseNum).child("teaminfo").child(TPName).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -147,6 +163,9 @@ public class TeamView extends AppCompatActivity {
         });
 
 
+        // when the maketeam button is clicked, check the status
+        // if the professor clicked the button, start the intent to create team
+        // else view the toast message
         maketeam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -12,6 +12,8 @@ public class DBData {
     public DBData(){
         // Default constructor required for calls to DataSnapshot.getValue(DBData.class)
     }
+
+    //When add Course button is clicked, DBdata is put data to database
     public DBData(String courseNum, String courseName, String pf_id, String pf_name ){
         this.courseNum =  courseNum;
         this.courseName = courseName;
@@ -28,5 +30,3 @@ public class DBData {
         return result;
     }
 }
-//Realtime DB 사용법
-// https://m.blog.naver.com/PostView.nhn?blogId=nife0719&logNo=221049879862&proxyReferer=https:%2F%2Fwww.google.com%2F

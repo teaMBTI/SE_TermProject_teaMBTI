@@ -28,7 +28,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
             Intent intent = new Intent(this, ListCourseRoom.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            //알림 눌렀을때 행위
+            //푸시 알림 눌렀을때 행위
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ListCourseRoom.class), 0);
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.mbti_team)

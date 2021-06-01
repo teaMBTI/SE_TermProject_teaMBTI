@@ -19,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
-//test push commit
 public class WritePInformation extends AppCompatActivity {
     private DatabaseReference mPostReference;
     private FirebaseAuth mFirebaseAuth;
@@ -35,14 +34,14 @@ public class WritePInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pinfo);
 
-        mFirebaseAuth = FirebaseAuth.getInstance(); //유저를 얻어온다
+        mFirebaseAuth = FirebaseAuth.getInstance(); //현재 유저 정보를 얻어온다
 
         EditText name2 = findViewById(R.id.nameEditText);
         EditText id2 = findViewById(R.id.idEditText);
         checkBox = findViewById(R.id.professor);
         checkBox.setChecked(true);
         if(checkBox.isChecked()){
-            status = "Professor";
+            status = "Professor"; // 초기화면부터 체크박스 활성화  
         }
 
         Button save_prof = findViewById(R.id.save_prof);
@@ -54,7 +53,7 @@ public class WritePInformation extends AppCompatActivity {
 
                 postFirebaseDatabase(true);
 
-                startLoginActivity(); //정보저장 성공 시 메인 화면으로 이동
+                startLoginActivity(); //정보 저장 성공 시 로그인 화면으로 이동
             }
         });
 
@@ -67,7 +66,8 @@ public class WritePInformation extends AppCompatActivity {
             }
         }
     }
-
+ 
+    // 입력된 정보 파이어베이스 db에 저장
     public void postFirebaseDatabase(boolean add){
         mPostReference = FirebaseDatabase.getInstance().getReference();
         Map<String, Object> childUpdates = new HashMap<>();
@@ -80,6 +80,7 @@ public class WritePInformation extends AppCompatActivity {
         mPostReference.updateChildren(childUpdates);
     }
 
+    // 로그인 화면으로 전환
     private void startLoginActivity()
     {
         Intent intent = new Intent(this, LoginActivity.class);

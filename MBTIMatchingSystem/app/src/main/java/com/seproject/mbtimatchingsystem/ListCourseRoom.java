@@ -154,6 +154,7 @@ public class ListCourseRoom extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             readEmailAndPutId(); //db st_participate_id에 입력
+                            
                             String course = (String) listView.getItemAtPosition(position);
                             if (course.contains("소프트웨어공학")) {
                                 topic = "SE";
@@ -164,8 +165,9 @@ public class ListCourseRoom extends AppCompatActivity {
                             } else if (course.equals("모바일프로그래밍(10178002)")) {
                                 topic = "MP2";
                             }
+                            
                             nowCourseNum=cuttingCourseNum(course);
-                            if (topic.equals("SE")) {
+                            if (topic.equals("SE")) { //소프트웨어공학을 구독, 해당 학생들을 대상으로 푸시알림 가능
                                 FirebaseMessaging.getInstance().subscribeToTopic("SE")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -179,7 +181,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("DS")) {
+                            if (topic.equals("DS")) { //데이터 과학을 구독, 해당 학생들을 대상으로 푸시알림 가능
                                 FirebaseMessaging.getInstance().subscribeToTopic("DS")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -193,7 +195,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("MP1")) {
+                            if (topic.equals("MP1")) { //모바일 프로그래밍 1분반을 구독, 해당 학생들을 대상으로 푸시알림 가능
                                 FirebaseMessaging.getInstance().subscribeToTopic("MP1")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -207,7 +209,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("MP2")) {
+                            if (topic.equals("MP2")) { //모바일 프로그래밍 2분반을 구독, 해당 학생들을 대상으로 푸시알림 가능
                                 FirebaseMessaging.getInstance().subscribeToTopic("MP2")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

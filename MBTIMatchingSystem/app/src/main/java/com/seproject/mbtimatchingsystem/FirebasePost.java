@@ -40,7 +40,7 @@ public class FirebasePost {
     }
 
     @Exclude
-    public Map<String, Object> toMap() {
+    public Map<String, Object> toMap() { //교수자 & 학생 정보 db에 보내기
         HashMap<String, Object> result = new HashMap<>();
         result.put("id", id);
         result.put("name", name);

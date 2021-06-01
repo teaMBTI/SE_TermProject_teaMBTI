@@ -39,16 +39,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.e("클릭", "클릭");
                 login();
             }
         });
+
         Button button3 = findViewById(R.id.gotoJoinButton);
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startJoinActivity();
-            }
+            } //회원가입 화면으로
         });
 
     }
@@ -79,7 +79,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 startListCourseRoomActivity(); //로그인 성공 시 메인 화면으로 이동
                             } else {
                                 // If sign in fails, display a message to the user.
-                                //Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                 if (task.getException() != null) //로그인 중 에러 발생 시 메세지 출력
                                 {
                                     startToast(task.getException().toString());

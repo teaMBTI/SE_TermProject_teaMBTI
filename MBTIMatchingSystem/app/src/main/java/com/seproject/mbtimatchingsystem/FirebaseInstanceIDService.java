@@ -11,12 +11,10 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         String token = FirebaseInstanceId.getInstance().getToken();
-        Log.e(TAG, token);
         sendRegistrationToServer(token);
     }
 
     private void sendRegistrationToServer(String token)
     {
-
     }
 }

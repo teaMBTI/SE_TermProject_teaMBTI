@@ -153,6 +153,10 @@ public class ListCourseRoom extends AppCompatActivity {
                     //Course Entry Pop-up
                     AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this);
                     builder.setTitle("");
+
+                    /*
+                    * Subscribe to the subject upon participation.
+                      administrators can send push notification to students.*/
                     builder.setMessage("해당 강좌에 입장하시겠습니까?");
                     builder.setPositiveButton("예", new DialogInterface.OnClickListener() {//Enter the course
                         @Override

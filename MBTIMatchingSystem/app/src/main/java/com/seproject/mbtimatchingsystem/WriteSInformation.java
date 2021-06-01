@@ -47,7 +47,7 @@ public class WriteSInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sinfo);
 
-        mFirebaseAuth = FirebaseAuth.getInstance(); //현재 로그인된 유저 정보를 얻어온다
+        mFirebaseAuth = FirebaseAuth.getInstance(); //Get current user information
 
         EditText name2 = findViewById(R.id.nameEditText);
         EditText id2 = findViewById(R.id.idEditText);
@@ -55,7 +55,7 @@ public class WriteSInformation extends AppCompatActivity {
         EditText katalk2 = findViewById(R.id.katalkEditText);
 
         Spinner spinner = (Spinner)findViewById(R.id.mbti);
-        // 스피너에 mbti 어레이 연결 
+        // Attaching an mbti array to a spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, MBTI);
         spinner.setAdapter(adapter);
@@ -74,7 +74,7 @@ public class WriteSInformation extends AppCompatActivity {
         checkBox = findViewById(R.id.student);
         checkBox.setChecked(true);
         if(checkBox.isChecked()){
-            status = "Student"; // 초기 화면부터 체크박스 활성화
+            status = "Student";
         }
         
         Button save = findViewById(R.id.save_std);
@@ -88,7 +88,7 @@ public class WriteSInformation extends AppCompatActivity {
 
                 postFirebaseDatabase(true);
 
-                startLoginActivity(); //정보 저장 성공 시 로그인 화면으로 이동
+                startLoginActivity(); //Go to login screen on successful save
                 }
         });
 
@@ -103,14 +103,14 @@ public class WriteSInformation extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
-                // 사용자 이메일 가져오기
+                // Get user email
                 email = profile.getEmail();
 
             }
         }
     }
 
-    // 입력된 정보 파이어베이스 db에 저장
+    // Save entered information to Firebase db
     public void postFirebaseDatabase(boolean add){
         mPostReference = FirebaseDatabase.getInstance().getReference();
         Map<String, Object> childUpdates = new HashMap<>();
@@ -123,7 +123,7 @@ public class WriteSInformation extends AppCompatActivity {
         mPostReference.updateChildren(childUpdates);
     }
 
-    // 로그인 화면으로 전환
+    // Go to login screen
     private void startLoginActivity()
     {
         Intent intent = new Intent(this, LoginActivity.class);

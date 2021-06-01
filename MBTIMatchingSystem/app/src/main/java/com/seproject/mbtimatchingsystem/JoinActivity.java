@@ -21,7 +21,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class JoinActivity extends AppCompatActivity {
     private static final String TAG = "JoinActivity";
-    private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
+    private FirebaseAuth mAuth; //Firebase Instance Declaration
 
 
     @Override
@@ -30,14 +30,12 @@ public class JoinActivity extends AppCompatActivity {
         setContentView(R.layout.join_member);
 
         // Initialize Firebase Auth
-        //onCreate() 메서드에서 FirebaseAuth 인스턴스를 초기화합니다.
         mAuth = FirebaseAuth.getInstance();
 
-        Button button = findViewById(R.id.save); //회원가입 버튼 객체 생성 및 클릭 리스너
+        Button button = findViewById(R.id.save); //Create membership button object & click listener
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.e("클릭", "클릭");
                 joinMember();
             }
         });
@@ -45,14 +43,15 @@ public class JoinActivity extends AppCompatActivity {
     }
 
     @Override
-    //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
+    //When initializing an activity, make sure that the user is currently logged in.
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
     }
 
-    //createUserWithEmailAndPassword 메서드를 사용하여 이메일 주소와 비밀번호를 가져와 유효성을 검사한 후 신규 사용자를 만드는 새 createAccount 메서드를 만듭니다.
+//    Use the createUserWithEmailAndPassword method to obtain email addresses and passwords,
+//    validate them, and create a new createAccount method to create new users.
     private void joinMember()
     {
         String name = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
@@ -64,7 +63,7 @@ public class JoinActivity extends AppCompatActivity {
 
         if(name.length() > 0 && email.length() > 0 && password.length() > 0 && passwordCheck.length() > 0) { //editText에 입력되면
 
-            if (password.equals(passwordCheck)) //비밀번호와 비밀번호 확인 모두 일치하면 회원가입 완료
+            if (password.equals(passwordCheck)) //Complete membership when both password and password verification match
             {
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -99,27 +98,27 @@ public class JoinActivity extends AppCompatActivity {
                                         startWriteSInfoActivity();
                                     }
 
-                                    finish(); //입력한 정보 삭제하기
+                                    finish(); //Delete the entered information
 
-                                    //성공 시 UI 로직
+                                    //UI Logic on Success
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     //Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                    if (task.getException() != null) //로그인 중 에러 발생 시 메세지 출력
+                                    if (task.getException() != null) //Print a message when an error occurs.
                                     {
                                         startToast(task.getException().toString());
                                     }
 
-                                    //실패 시 UI 로직
+                                    //UI logic on failure
                                 }
                             }
                         });
             } else {
-                //비밀번호와 비밀번호 확인이 불일치 하다면 토스트 메세지 출력
+                //Print a toast message if the password and password verification do not match.
                 startToast("비밀번호가 일치하지 않습니다!");
             }
-        } else {//editText에 입력 안됨
-                startToast("정보를 입력해주세요.");
+        } else {//Not entered in editText
+            startToast("정보를 입력해주세요.");
             }
     }
 
@@ -128,7 +127,7 @@ public class JoinActivity extends AppCompatActivity {
         super.onBackPressed();
         moveTaskToBack(true);
         android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(1); //메인에서 로그아웃 하고 뒤로가기했는데 또 메인 뜨는 일 없게 강제종료
+        System.exit(1); //Forced Termination
     }
 
     private void startToast(String msg)

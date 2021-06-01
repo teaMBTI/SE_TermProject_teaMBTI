@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "LoginActivity";
-    private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
+    private FirebaseAuth mAuth; //Firebase Instance Declaration
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         setContentView(R.layout.activity_login);
 
         // Initialize Firebase Auth
-        //onCreate() 메서드에서 FirebaseAuth 인스턴스를 초기화합니다.
         mAuth = FirebaseAuth.getInstance();
 
         Button button2 = findViewById(R.id.loginButton);
@@ -48,25 +47,26 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onClick(View v) {
                 startJoinActivity();
-            } //회원가입 화면으로
+            } //Go to Membership Screen
         });
 
     }
 
     @Override
-    //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
+    //When initializing an activity, make sure that the user is currently logged in.
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
     }
 
-    //createUserWithEmailAndPassword 메서드를 사용하여 이메일 주소와 비밀번호를 가져와 유효성을 검사한 후 신규 사용자를 만드는 새 createAccount 메서드를 만듭니다.
+    //    Use the createUserWithEmailAndPassword method to obtain email addresses and passwords,
+//    validate them, and create a new createAccount method to create new users.
     private void login() {
         String email = ((EditText) findViewById(R.id.emailEditText)).getText().toString();
         String password = ((EditText) findViewById(R.id.passwordEditText)).getText().toString();
 
-        if (email.length() > 0 && password.length() > 0) { //editText에 입력되면
+        if (email.length() > 0 && password.length() > 0) { //When entered in editText
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -76,20 +76,18 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 startToast("로그인 성공");
-                                startListCourseRoomActivity(); //로그인 성공 시 메인 화면으로 이동
+                                startListCourseRoomActivity(); //Go to main screen on login success
                             } else {
                                 // If sign in fails, display a message to the user.
-                                if (task.getException() != null) //로그인 중 에러 발생 시 메세지 출력
+                                if (task.getException() != null) //Print a message when an error occurs while logging in.
                                 {
                                     startToast(task.getException().toString());
                                 }
-
-                                //실패 시 UI 로직
                             }
                         }
                     });
 
-        } else {//editText에 입력 안됨
+        } else { //Not entered in editText
             startToast("이메일 또는 비밀번호를 입력해주세요.");
         }
     }
@@ -103,12 +101,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onBackPressed();
         moveTaskToBack(true);
         android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(1); //메인에서 로그아웃 하고 뒤로가기했는데 또 메인 뜨는 일 없게 강제종료
+        System.exit(1); //Force Termination
     }
 
     private void startListCourseRoomActivity() {
         Intent intent = new Intent(this, ListCourseRoom.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // 로그인 후 메인으로 가면 뒤로가기 시 다시 로그인정보가 들어 있는 화면이 아닌 앱꺼지기
+         // If user go back to the main after logging in, turn off the app, not the screen that contains the login information.
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
@@ -129,7 +128,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (m.matches()) {
             return "Email Valid";
         }
-        return "Email Invalid"; // 이메일 구조가 아니면 실패
+        return "Email Invalid"; // Failure unless email structure
     }
 
     public String isValidPassword(String password) {
@@ -137,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (testPasswordData.length() > 5)
             return "Password Valid";
         else
-            return "Password Invalid"; //비밀 번호 5자리 이하 실패
+            return "Password Invalid"; //Password less than 5 digits failed
     }
 
     public String loginCheck(String email, String password) {
@@ -148,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 return "Login Success"; 
             }
         else
-            return "Login Fail"; //일치하는 데이터가 없다면 실패
+            return "Login Fail"; //Failure if no data matches
     }
 }
 

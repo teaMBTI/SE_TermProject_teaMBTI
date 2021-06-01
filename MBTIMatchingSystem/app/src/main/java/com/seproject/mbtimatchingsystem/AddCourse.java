@@ -26,8 +26,6 @@ public class AddCourse extends AppCompatActivity {
 
 
     private DatabaseReference mPostReference;
-    private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
-    private FirebaseUser mFirebaseUser;
     public String courseNum;
     public String courseName;
     public String pf_id;
@@ -51,29 +49,30 @@ public class AddCourse extends AppCompatActivity {
 
 
         /* addCourse button listener */
-        okAddCourseButton.setOnClickListener(new View.OnClickListener() { //강좌 개설 확인 버튼
+        okAddCourseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //information about course
                 courseNum = courseNum2.getText().toString();
                 courseName = courseName2.getText().toString();
                 pf_id = pf_id2.getText().toString();
                 pf_name = pf_name2.getText().toString();
 
                 Toast.makeText(AddCourse.this, "학수번호: " + courseNum + "\n과목 이름: " + courseName + "\n교수 교번: "+ pf_id + "\n교수 이름: "+ pf_name, Toast.LENGTH_SHORT).show();
-                postDBData(true); //데이터 파이어베이스 입력
+                postDBData(true); //Input data to database
 
                 Intent intent = new Intent(getApplicationContext(),ListCourseRoom.class);
                 startActivity(intent);
-                // 중첩을 피하기 위해서 다른 activity 로 갈때 quit activity
+                // Quit activity, when going to another activity to avoid overlap.
                 finish();
             }
         });
 
 
-
     }
 
-
+    //Input data to database
     private void postDBData(boolean add) {
         mPostReference = FirebaseDatabase.getInstance().getReference();
         Map<String, Object> childUpdates = new HashMap<>();

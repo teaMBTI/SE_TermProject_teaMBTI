@@ -25,33 +25,25 @@ import java.util.Set;
 
 public class MakeTeam extends AppCompatActivity {
 
-    // 팀 개수 설정은 의미가 없는것 같아서 입력값은 최소 팀원 수만 입력해도 될 것 같아요
-    int minmember = 0;
-    String courseNum;
-
-    // MBTI 별로 멤버를 저장하기 위한 ArrayList
-    /*
-     * 메커니즘 >
-     * 1. NP/NJ/SP/SJ 별로 인원 분류 후 팀 매칭
-     * 2. 나누어떨어지지 않는 인원들은 P/J 별로 분류 후 매칭
-     */
-
-    // 처음에 전체 인원을 담을 ArrayList
+    // ArrayList for whole member
     ArrayList<String> mbti = new ArrayList<>();
 
-    // NP/NJ/SP/SJ 별로 분류할 ArrayList
+    // Arraylist for NP/NJ/SP/SJ (1st classification)
     ArrayList<String> NP = new ArrayList<>();
     ArrayList<String> NJ = new ArrayList<>();
     ArrayList<String> SP = new ArrayList<>();
     ArrayList<String> SJ = new ArrayList<>();
 
-    // 1차 분류 후 P와 J 별로 분류할 ArrayList
+    // Arraylist for P/J (2nd classification)
     ArrayList<String> P = new ArrayList<>();
     ArrayList<String> J = new ArrayList<>();
 
-    // 팀 매칭 결과를 담을 2d array
+    // 2d array for saving team info
     String[][] result = new String[100][100];
 
+
+    int minmember = 0;
+    String courseNum;
 
     private DatabaseReference mDatabase;
     Button btn;
@@ -79,6 +71,8 @@ public class MakeTeam extends AppCompatActivity {
         btn = (Button) findViewById(R.id.createTeam);
 
 
+        // Getting the students' list of the course from the firebase
+        // and then, put them to the declared arraylist
         mDatabase.child("course_list").child(courseNum).child("st_Participate_id").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -106,6 +100,8 @@ public class MakeTeam extends AppCompatActivity {
 
 
 
+        // when the button is clicked, update the team info in the database
+        // and go to the teamview screen
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +114,7 @@ public class MakeTeam extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), TeamView.class);
                 HashMap<String, String> res = new HashMap<>();
 
+                // Making a string for the team result
                 for(int i=0; i<result.length; i++){
                     String temp ="";
                     for(int j=0; j<result[i].length; j++) {
@@ -132,6 +129,7 @@ public class MakeTeam extends AppCompatActivity {
 
                 }
 
+                // set the team info to the firebase
                 mDatabase.child("course_list").child(courseNum).child("teaminfo").child(TPName).setValue(res);
 
                 startActivity(intent);
@@ -143,8 +141,8 @@ public class MakeTeam extends AppCompatActivity {
 
     public void team_matching(){
         /*
-         * 1. NP/NJ/SP/SJ 별로 인원 분류 후 팀 매칭
-         * 처음에 모든 인원을 담아놓은 MBTI에서 멤버별로 분류하는 부분
+         * classify the members to NP/NJ/SP/SJ array
+         * The classification is processed by their MBTI
          */
         while(mbti.size() != 0) {
             String temp = mbti.get(0);
@@ -167,15 +165,15 @@ public class MakeTeam extends AppCompatActivity {
 
 
         /*
-         * NP/NJ/SP/SJ 순으로 팀을 result array로 옮기는 과정.
-         * 각 ArrayList 별로 4번 반복
-         * 메커니즘 >
-         * 1. NP ArryayList에 담겨있는 멤버수 체크
-         * 2. ArrayList에 담겨있는 멤버수가 minmembers 이상 있는 경우, 앞에서부터 순서대로 minmembers의 수 만큼 뽑아 팀 매칭
-         * 3. 이 과정을 반복하다가, ArrayList 안에 minmembers 보다 적게 남은 경우, 남아있는 멤버들을 J or P 에 맞는 ArrayList에 넣는다
+         * create team result array using NP/NJ/SP/SJ arraylists
+         * Algorithm mechanism >
+         * 1. check number of members in ArryayList
+         * 2. number of members are more than minmembers, pick the number of minmembers and match a team by order
+         * 3. Repeating step 2, when members are lower than 'minmember' in the arraylist, put the members in 'J' or 'P' array properly
          */
         int idx=0;
 
+        // classify for members who have 'N' and 'P'
         while(NP.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 int rand = (int) (Math.random() * NP.size());
@@ -191,6 +189,7 @@ public class MakeTeam extends AppCompatActivity {
             }
         }
 
+        // classify for members who have 'N' and 'J'
         while(NJ.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 result[idx][i] = NJ.get(0);
@@ -205,6 +204,7 @@ public class MakeTeam extends AppCompatActivity {
             }
         }
 
+        // classify for members who have 'S' and 'P'
         while(SP.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 result[idx][i] = SP.get(0);
@@ -219,6 +219,7 @@ public class MakeTeam extends AppCompatActivity {
             }
         }
 
+        // classify for members who have 'S' and 'J'
         while(SJ.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 result[idx][i] = SJ.get(0);
@@ -233,7 +234,7 @@ public class MakeTeam extends AppCompatActivity {
             }
         }
 
-        // P 재분류
+        // classify again for 'P' group
         while(P.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 result[idx][i] = P.get(0);
@@ -255,7 +256,7 @@ public class MakeTeam extends AppCompatActivity {
         }
 
 
-        // J 재분류
+        // classify again for 'J' group
         while(J.size() >= minmember) {
             for(int i=0; i<minmember; i++) {
                 result[idx][i] = J.get(0);
@@ -277,6 +278,11 @@ public class MakeTeam extends AppCompatActivity {
         }
     }
 
+    /*
+        Unit test method
+        put minmember and minimal data
+        and result array is not null, it is processing well
+     */
     public String createTeamTest() {
 
         int minmember=2;

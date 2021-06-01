@@ -39,40 +39,49 @@ public class ListCourseRoom extends AppCompatActivity {
     private FirebaseDatabase database;
     private DatabaseReference mPostReference;
     private DatabaseReference ref;
-    private FirebaseAuth mAuth; //파이어베이스 인스턴스 선언
+    private FirebaseAuth mAuth;
     private FirebaseUser mFirebaseUser;
-    private ChildEventListener mChild;
-    private ListView listView;
     private ArrayAdapter<String> adapter;
+
     List<Object> courseList = new ArrayList<Object>();
+    String id_listEmail;
+
+    //User Information
     String nowEmail;
     String nowId;
     String nowCourseNum;
     String nowMbti;
     String nowStatus;
-    String id_listEmail;
+
+
     public Button logOutButton;
     ImageButton addCourseButton;
     private static final String TAG = "ListCourseRoom";
     String topic = "null";
-    private long backBtnTime = 0; // 뒤로가기 버튼 누를 때 필요
+
+    // Backward
+    private long backBtnTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_course_room);
 
-        mAuth = FirebaseAuth.getInstance(); //파이어베이스 인증 객체 선언
-        mFirebaseUser = mAuth.getCurrentUser();//혹시 인증 유지가 안될 수 있으니 유저 확인
 
-        if (mFirebaseUser == null) //현재 로그인된 유저가 있는지 확인
-        {
-            startLoginActivity(); //로그인이 안되어 있으면 로그인     화면으로 이동
-        }else { //현재 로그인 되어 있다면
+        //Firebase Authentication Object Declaration
+        mAuth = FirebaseAuth.getInstance();
+        //Current User
+        mFirebaseUser = mAuth.getCurrentUser();
+
+        //Check for currently logged in users
+        if (mFirebaseUser == null) //If user are not logged in,
+             startLoginActivity();
+
+        else { //If user are logged in,
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
             int i=0;
-            for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
+            // Get current user email
+            for (UserInfo profile : user.getProviderData()) {
                 String currentUserEmail = profile.getUid();
                 if(i==1)
                     nowEmail=currentUserEmail;
@@ -80,50 +89,49 @@ public class ListCourseRoom extends AppCompatActivity {
             }
             database= FirebaseDatabase.getInstance();
             ref=database.getReference("id_list");
-            ref.addValueEventListener(new ValueEventListener() { //유저의 상태를 받아온다.(Professor, Student)
+            ref.addValueEventListener(new ValueEventListener() { //Get current user status(Professor, Student)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         id_listEmail = snapshot.getValue().toString();
                         nowStatus =id_listEmail;
-                        id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
-                        if(nowEmail.equals(id_listEmail)) {
+                        id_listEmail = cuttingEmail(id_listEmail);
+                        if(nowEmail.equals(id_listEmail)) { //If the current user emails equals the email in listEmail
                             nowStatus =cuttingStatus(nowStatus);
-                            Log.e("MMMYYTAGG", "현재 유저 상태: " +nowStatus);
-                            break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시 nowId에 학번넣고 break;
+                            break; //Put the student_id(학번) in nowId and break
                         }
                     }
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) { }
             });
+
+            // Get current use nickname
             if (user != null) {
                 for (UserInfo profile : user.getProviderData()) {
-                    // 사용자 닉네임 가져오기
                     String name = profile.getDisplayName();
                 }
             }
         }
 
 
-        /* ListView에 목록 세팅 */
+        /* Set a list of current courses in the listView */
         ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
         adapter = new ArrayAdapter<String>( this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         listView.setAdapter(adapter);
 
-
+        //Read the course list data from database
         database= FirebaseDatabase.getInstance();
         mPostReference=database.getReference("course_list");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //강좌목록(리스트뷰)데이터 읽기
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adapter.clear();
                 for(DataSnapshot messageData : dataSnapshot.getChildren()){
                     String course_list = messageData.getValue().toString();
-                    course_list = cutting(course_list); //value 값 필요한 부분만 자르기(강좌명, 학수번호)
+                    course_list = cutting(course_list);
                     courseList.add(course_list);
                     adapter.add(course_list);
-
                 }
                 adapter.notifyDataSetChanged();
                 listView.setSelection(adapter.getCount()-1);
@@ -133,28 +141,23 @@ public class ListCourseRoom extends AppCompatActivity {
             }
         });
 
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
+        /* Event when a course is clicked in the listView */
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String course = (String) listView.getItemAtPosition(position);
-                if(nowStatus.equals("Professor")){ // Professor은 팝업창이 안뜬다.
+                if(nowStatus.equals("Professor")){ //If the user is a professor
                     goToListTeamProject(course);
                 }
-                else if(nowStatus.equals("Student")) { //Student 경우
-
-                    /*if( st_participate_id.equals("presence")){ //이미 강좌에 입장한 학생이라면 바로 입장
-                        goToListTeamProject(course);
-                    }
-                    else{ */          //처음 강좌에 입장하는 학생이면, 팝업
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this); //강좌 입장하시겠습니까 팝업
+                else if(nowStatus.equals("Student")) { //If the user is a student
+                    //Course Entry Pop-up
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ListCourseRoom.this);
                     builder.setTitle("");
                     builder.setMessage("해당 강좌에 입장하시겠습니까?");
-                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {//Enter the course
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-                            readEmailAndPutId(); //db st_participate_id에 입력
-                            
+                            readEmailAndPutId();
                             String course = (String) listView.getItemAtPosition(position);
                             if (course.contains("소프트웨어공학")) {
                                 topic = "SE";
@@ -165,9 +168,8 @@ public class ListCourseRoom extends AppCompatActivity {
                             } else if (course.equals("모바일프로그래밍(10178002)")) {
                                 topic = "MP2";
                             }
-                            
                             nowCourseNum=cuttingCourseNum(course);
-                            if (topic.equals("SE")) { //소프트웨어공학을 구독, 해당 학생들을 대상으로 푸시알림 가능
+                            if (topic.equals("SE")) {
                                 FirebaseMessaging.getInstance().subscribeToTopic("SE")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -181,7 +183,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("DS")) { //데이터 과학을 구독, 해당 학생들을 대상으로 푸시알림 가능
+                            if (topic.equals("DS")) {
                                 FirebaseMessaging.getInstance().subscribeToTopic("DS")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -195,7 +197,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("MP1")) { //모바일 프로그래밍 1분반을 구독, 해당 학생들을 대상으로 푸시알림 가능
+                            if (topic.equals("MP1")) {
                                 FirebaseMessaging.getInstance().subscribeToTopic("MP1")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -209,7 +211,7 @@ public class ListCourseRoom extends AppCompatActivity {
                                             }
                                         });
                             }
-                            if (topic.equals("MP2")) { //모바일 프로그래밍 2분반을 구독, 해당 학생들을 대상으로 푸시알림 가능
+                            if (topic.equals("MP2")) {
                                 FirebaseMessaging.getInstance().subscribeToTopic("MP2")
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -226,7 +228,7 @@ public class ListCourseRoom extends AppCompatActivity {
                             goToListTeamProject(course);
                         }
                     });
-                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {//Not enter the course
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             startToast("해당 강좌에 입장하지 않습니다.");
@@ -236,28 +238,23 @@ public class ListCourseRoom extends AppCompatActivity {
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();}
             }
-            /*  }*/
         });
 
 
-
-
-        logOutButton = findViewById(R.id.logOutButton); //로그아웃 버튼
+        logOutButton = findViewById(R.id.logOutButton); //Logout Button
         logOutButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     FirebaseAuth.getInstance().signOut();
-                    startLoginActivity(); //로그아웃되면 로그인 화면으로 이동
+                    startLoginActivity(); //After logout, go Login activity
                 }
             });
 
-        addCourseButton = findViewById(R.id.addCourseButton); //강좌개설 버튼
-        /* addCourse button listener */
+        addCourseButton = findViewById(R.id.addCourseButton); //Add Course Button
         addCourseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                   /* statusCheck();//상태를 가져온다*/
-                    if(nowStatus.equals("Professor")){
+                    if(nowStatus.equals("Professor")){ //AddCourse can be used only professor
                         Intent intent = new Intent(getApplicationContext(),AddCourse.class);
                         startActivity(intent);
                     }
@@ -267,6 +264,7 @@ public class ListCourseRoom extends AppCompatActivity {
             });
     }
 
+    //Enter the ListTeamProject activity
     private void goToListTeamProject(String course) {
         startToast(course);
         nowCourseNum=cuttingCourseNum(course);
@@ -277,13 +275,12 @@ public class ListCourseRoom extends AppCompatActivity {
         startActivity(NewActivity);
     }
 
-
+    /*Read current use email, get User studentId in nowId*/
     private void readEmailAndPutId() {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         int i = 0;
         for (UserInfo profile : user.getProviderData()) {
-            // 현재 사용자 이메일 가져오기
             String currentUserEmail = profile.getUid();
             if (i == 1) {
                 nowEmail = currentUserEmail;
@@ -299,18 +296,16 @@ public class ListCourseRoom extends AppCompatActivity {
                     id_listEmail = snapshot.getValue().toString();
                     nowId = id_listEmail;
                     nowMbti = id_listEmail;
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                    id_listEmail = cuttingEmail(id_listEmail);
 
                     if (nowEmail.equals(id_listEmail)) {
                         nowId = cuttingId(nowId);
                         nowMbti = cuttingMbti(nowMbti);
-/*                         Log.e("MMMYYTAGG", "현재 유저 학번: " +nowId);
-                         Log.e("MMMYYTAGG", "현재 유저 MBTI: " +nowMbti);*/
-                        break; //현재 유저 이메일과 listEmail에 있는 이메일이 일치할시, nowId에 학번넣고 break;
+                        break;
                     }
                 }
                 DatabaseReference courseRef = database.getReference().child("course_list");
-                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //st_participate_id에 학번,mbti 데이터쓰기
+                courseRef.child(nowCourseNum).child("st_Participate_id").child(nowId).setValue(nowMbti); //Write studentId, mbti data in database participate_id
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -319,50 +314,74 @@ public class ListCourseRoom extends AppCompatActivity {
     }
 
     @Override
-    //활동을 초기화할 때 사용자가 현재 로그인되어 있는지 확인합니다.
+    //When initializing an activity, check that the user is currently logged in
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
     }
 
+    //Go Login Activity
     private void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
+
+    //Toast function
     private void startToast(String msg)
     { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 
-    private String cutting(String msg) //소프트웨어공학(10177002)
+    // Cutting list to courseName+ CourseNum only ex)소프트웨어공학(10177002)
+    private String cutting(String msg)
     { String temp = msg;
-        msg= msg.substring(msg.indexOf(", courseName")+13,msg.indexOf(", pf_name")); //courseName=자르기
-        temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id")); //course_num 자르기
+        msg= msg.substring(msg.indexOf(", courseName")+13,msg.indexOf(", pf_name"));
+        temp = temp.substring( temp.indexOf(", courseNum")+12, temp.indexOf(", pf_id"));
         msg = msg+"("+temp+")";
         return msg; }
-    private String cuttingStatus(String msg) { //Status만 자르기
+    // Cutting list to status only
+    private String cuttingStatus(String msg) {
         msg= msg.substring(msg.indexOf(", status=")+9,msg.indexOf("}"));
         return msg;
     }
-    private String cuttingEmail(String msg) {//이메일만 자르기
+    // Cutting list to email only
+    private String cuttingEmail(String msg) {
         msg= msg.substring(msg.indexOf(", email=")+8,msg.indexOf(", status"));
         return msg;
     }
-
-    private String cuttingId(String msg) {//학번만 자르기
+    // Cutting list to student Id only
+    private String cuttingId(String msg) {
         msg = msg.substring(msg.indexOf(", id=") + 5, msg.indexOf(", email"));
         return msg;
     }
-
-    private String cuttingMbti(String msg) { //MBTI만 자르기
+    // Cutting list to user MBTI only
+    private String cuttingMbti(String msg) {
         msg = msg.substring(msg.indexOf(", mbti=") + 7, msg.indexOf(", id"));
         return msg;
     }
-    private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
+    // Cutting list to Course num only
+    private String cuttingCourseNum(String msg) {
         msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
 
+    //Back button event
+    @Override
+    public void onBackPressed() {
+        long curTime = System.currentTimeMillis();
+        long gapTime = curTime - backBtnTime;
 
+        if(0 <= gapTime && 2000 >= gapTime) {
+            super.onBackPressed();
+        }
+        else {
+            backBtnTime = curTime;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+    //Unit testing
     public String getStatus(String email) {
       String testStudentData=" email:harry@google.com, status:Student, email:mj@gmail.com, status:Student, email:bere@google.com, status:Student ...";
       String testSProfessorData="email:Wonkimtx@naver.com , status:Professor, email:kimy17@google.com, status:Professor ...";
@@ -381,15 +400,6 @@ public class ListCourseRoom extends AppCompatActivity {
             temp = temp.substring(0, courseListData.indexOf(courseNum)-1);
             enterCourseData = temp;
         }
-        /*ListView listView = (ListView) this.findViewById(R.id.listViewCourseRoom);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { //강좌 클릭 이벤트트
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String course = (String) listView.getItemAtPosition(position);
-                course = "소프트웨어공학";
-                enterNowCourse[0] =course;
-            }
-         });*/
         return enterCourseData;
     }
     public String getAddCourseInfo(String courseNum, String courseName, String pf_id, String pf_name) {
@@ -400,21 +410,5 @@ public class ListCourseRoom extends AppCompatActivity {
 
             return "NO";
     }
-
-    @Override
-    public void onBackPressed() {
-        long curTime = System.currentTimeMillis();
-        long gapTime = curTime - backBtnTime;
-
-        if(0 <= gapTime && 2000 >= gapTime) {
-            super.onBackPressed();
-        }
-        else {
-            backBtnTime = curTime;
-            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
 
 }

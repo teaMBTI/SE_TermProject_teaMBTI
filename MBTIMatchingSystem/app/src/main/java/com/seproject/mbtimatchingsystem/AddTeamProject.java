@@ -51,7 +51,7 @@ public class AddTeamProject extends AppCompatActivity {
 
         Intent passedIntent = getIntent();
         if (passedIntent != null) {
-            course_num = passedIntent.getStringExtra("courseNum");
+            course_num = passedIntent.getStringExtra("courseNum"); //get course number from ListTeamProject activity
 
         }
 
@@ -63,7 +63,7 @@ public class AddTeamProject extends AppCompatActivity {
         doneBtn = findViewById(R.id.doneButton);
 
 
-        doneBtn.setOnClickListener(new View.OnClickListener() { //팀프로젝트 생성 완료 버튼
+        doneBtn.setOnClickListener(new View.OnClickListener() { //A listener for the team project creation complete button
             @Override
             public void onClick(View view) {
                 courseNum = edit_courseNum.getText().toString();
@@ -84,7 +84,7 @@ public class AddTeamProject extends AppCompatActivity {
         });
     }
 
-
+    //Upload team project information(Team project name, the total number of students, the number of team) to DB
     private void uploadData(boolean add) {
         mFirebaseReference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference courseRef = mFirebaseReference.child("course_list");

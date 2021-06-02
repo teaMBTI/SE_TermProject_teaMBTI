@@ -65,6 +65,7 @@ public class ListTeamProject extends AppCompatActivity {
 
         courseName = (TextView) findViewById(R.id.course_name);
 
+        //Get course information from ListCourseRoom activity
         Intent passedIntent = getIntent();
         if (passedIntent != null) {
             course = passedIntent.getStringExtra("course");
@@ -72,26 +73,28 @@ public class ListTeamProject extends AppCompatActivity {
             nowCourseNum = cuttingCourseNum(course);
         }
 
+        //Firebase Authentication Object Declaration and get current user's class
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         int i = 0;
-        for (UserInfo profile : user.getProviderData()) {// 현재 사용자(nowEmail) 이메일 가져오기
-            String currentUserEmail = profile.getUid();
+        for (UserInfo profile : user.getProviderData()) {
+            String currentUserEmail = profile.getUid(); // Get current user's email
             if (i == 1)
                 nowEmail = currentUserEmail;
             i++;
         }
         database = FirebaseDatabase.getInstance();
-        ref = database.getReference("id_list");
-        ref.addValueEventListener(new ValueEventListener() {   //addTeamProject 버튼 눌렀을시 유저의 status불러옴
+        ref = database.getReference("id_list"); //Get reference instance of "id_list"
+        ref.addValueEventListener(new ValueEventListener() {   //To get user's status when click addTeamProject button
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    id_listEmail = snapshot.getValue().toString();
+                    id_listEmail = snapshot.getValue().toString(); //read String type data from Firebase DB
                     nowStatus = id_listEmail;
-                    id_listEmail = cuttingEmail(id_listEmail); //value 값 필요한 부분만 자르기(이메일)
+                    id_listEmail = cuttingEmail(id_listEmail); //Get user's email from value that is read from DB
                     if (nowEmail.equals(id_listEmail)) {
                         nowStatus = cuttingStatus(nowStatus);
                         Log.e("MMMYYTAGG", "현재 유저 상태: " + nowStatus);
+                        //Can know whether this user is professor or student.
                         break;
                     }
                 }
@@ -103,16 +106,16 @@ public class ListTeamProject extends AppCompatActivity {
         });
 
 
-        ImageButton addTeamProject = (ImageButton) findViewById(R.id.addTeamProject); //팀프로젝트 생성
-        addTeamProject.setOnClickListener(new View.OnClickListener() {
+        ImageButton addTeamProject = (ImageButton) findViewById(R.id.addTeamProject);
+        addTeamProject.setOnClickListener(new View.OnClickListener() { //Create team project
             @Override
             public void onClick(View view) {
-                if (nowStatus.equals("Professor")) { //교수 계정인 경우
-                    Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class); //팀프로젝트 생성 화면으로 이동
-                    NewActivity.putExtra("courseNum", nowCourseNum);
+                if (nowStatus.equals("Professor")) { //When user's status is professor
+                    Intent NewActivity = new Intent(getApplicationContext(), AddTeamProject.class); //move to AddTeamProject activity
+                    NewActivity.putExtra("courseNum", nowCourseNum); //Pass course number to AddTeamProject activity
                     setResult(RESULT_OK, NewActivity);
                     startActivity(NewActivity);
-                } else
+                } else //If user's status is not professor
                     startToast("학생은 팀프로젝트 생성 권한이 없습니다.");
             }
         });
@@ -126,10 +129,10 @@ public class ListTeamProject extends AppCompatActivity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //팀프로젝트 리스트뷰 아이템 클릭시
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //When listView's item is clicked
                 String strText = (String) listView.getItemAtPosition(position);
-                Intent intent = new Intent(getApplicationContext(), TeamView.class); //TeamView 화면으로 이동
-                intent.putExtra("tpname", strText);
+                Intent intent = new Intent(getApplicationContext(), TeamView.class); //Move to teamView activity
+                intent.putExtra("tpname", strText); //Pass team project name, course number, status to teamView activity
                 intent.putExtra("coursenum", nowCourseNum);
                 intent.putExtra("status", nowStatus);
                 setResult(RESULT_OK, intent);
@@ -140,16 +143,16 @@ public class ListTeamProject extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         mPostReference = database.getReference("course_list/" + nowCourseNum + "/teamprojectlist");
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //Firebase로부터 읽어온 팀프로젝트 목록 보여줌
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() { //Show team project list read from DB
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) { //like Firebase data listener
                 adapter.clear();
-                for (DataSnapshot messageData : dataSnapshot.getChildren()) { // child 내에 있는 데이터만큼 반복
-                    String tp_list = messageData.getValue().toString(); //getValue()하면 TPName, teamNum, totalStuNum 모두 가져옴
-                    tp_list = cuttingTPName(tp_list); //문자열에서 TPName만 잘라 얻어오는 함수
-                    tpList.add(tp_list); //list array에 추가
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) { //Repeat as many times as the data in child
+                    String tp_list = messageData.getValue().toString(); //getValue()--> get TPName, teamNum, and totalStuNum.
+                    tp_list = cuttingTPName(tp_list); //A function to get only TPName from a string
+                    tpList.add(tp_list); //Add to list array
                     //Log.e("MMMYYTAGG", "tpList " +tp_list);
-                    //Log.e("MMMYYTAGG", "tpList " +tpList);  //이 함수를 벗어나면 null이 됨
+                    //Log.e("MMMYYTAGG", "tpList " +tpList);
                     adapter.add(tp_list);
                 }
                 adapter.notifyDataSetChanged();
@@ -161,7 +164,7 @@ public class ListTeamProject extends AppCompatActivity {
             }
         });
 
-        // 스크롤뷰 안에 리스트뷰 스크롤
+        // Scroll the listview inside the scrollview
         listView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -172,22 +175,22 @@ public class ListTeamProject extends AppCompatActivity {
     }
 
 
-    private String cuttingTPName(String msg) { //TPName만 자르기
+    private String cuttingTPName(String msg) { //Get TPName from String
         msg = msg.substring(msg.indexOf("TPName=") + 7, msg.indexOf(", teamNum"));
         return msg;
     }
 
-    private String cuttingEmail(String msg) {//이메일만 자르기
+    private String cuttingEmail(String msg) {//Get email from String
         msg = msg.substring(msg.indexOf(", email=") + 8, msg.indexOf(", status"));
         return msg;
     }
 
-    private String cuttingStatus(String msg) { //Status만 자르기
+    private String cuttingStatus(String msg) { //Get status from String
         msg = msg.substring(msg.indexOf(", status=") + 9, msg.indexOf("}"));
         return msg;
     }
     
-    private String cuttingCourseNum(String msg) { //해당 강좌 학수번호만 자르기
+    private String cuttingCourseNum(String msg) { //Get course number from String
         msg = msg.substring(msg.indexOf("(") + 1, msg.indexOf(")"));
         return msg;
     }
@@ -196,7 +199,7 @@ public class ListTeamProject extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    public String isContained(String tpName) {
+    public String isContained(String tpName) { //for Unit Testing
         String TP = tpName;
         testList.add("Architectural design");
         testList.add("Design & Implementation");
